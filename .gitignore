@@ -1,16 +1,1 @@
-<<<<<<< HEAD
 .credemtials
-=======
-/backend/node_modules
-/frontend/node_modules
-/credemtials
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
->>>>>>> origin/main
