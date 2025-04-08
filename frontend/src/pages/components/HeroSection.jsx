@@ -1,34 +1,37 @@
-import React from "react";
+import React, { useContext } from "react";
 import { motion } from "framer-motion";
-import COLORS from "../../constatnts/colors";
+import { ThemeContext } from "../../context/ThemeContext";
 
 function HeroSection() {
-  const color = COLORS.
+  const { theme, colors } = useContext(ThemeContext)
   return (
-    <section className="relative w-full h-screen flex items-center justify-center bg-gradient-to-r from-blue-500 to-blue-700 text-white">
+    <section
+      className="relative w-full h-screen flex items-center justify-center text-white"
+      style={{ background: colors.gradient }}
+    >
       <div className="max-w-3xl text-center">
-        
-        {/* App Name & Slogan */}
-        <motion.h1 
+        <motion.h1
           initial={{ opacity: 0, y: -50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           className="text-5xl font-bold"
         >
-          Welcome to <span className="text-yellow-300">FinFlow</span>
+          Welcome to <span style={{ color: colors.warning }}>FinFlow</span>
         </motion.h1>
-        
-        <motion.p 
+
+        <motion.p
           initial={{ opacity: 0, y: 50 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="mt-4 text-lg text-gray-200"
+          className="mt-4 text-lg"
+          style={{ color: colors.text }}
         >
-          Banking made <span className="text-green-300">simple</span>, <span className="text-red-300">secure</span> & <span className="text-yellow-300">swift</span>.
+          Banking made <span style={{ color: colors.success }}>simple</span>,{" "}
+          <span style={{ color: colors.danger }}>secure</span> &{" "}
+          <span style={{ color: colors.warning }}>swift</span>.
         </motion.p>
 
-        {/* CTA Buttons */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 0.6 }}
@@ -41,11 +44,9 @@ function HeroSection() {
             Go to Bank
           </button>
         </motion.div>
-
       </div>
     </section>
   );
 }
-
 
 export default HeroSection;
