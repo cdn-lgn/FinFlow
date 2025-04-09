@@ -10,7 +10,6 @@ import { ThemeContext } from "../../context/ThemeContext";
 export default function FeaturesSection() {
   const { colors } = useContext(ThemeContext);
 
-  
   const iconProps = {
     fontSize: "large",
     sx: { color: colors.primary },
