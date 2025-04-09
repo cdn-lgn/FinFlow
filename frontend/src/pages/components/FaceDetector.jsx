@@ -1,9 +1,9 @@
-import React, { useContext, useEffect, useRef, useState } from 'react';
-import * as faceapi from 'face-api.js';
-import { Box } from '@mui/material';
-import { ThemeContext } from '../../context/ThemeContext';
+import React, { useContext, useEffect, useRef, useState } from "react";
+import * as faceapi from "face-api.js";
+import { Box } from "@mui/material";
+import { ThemeContext } from "../../context/ThemeContext";
 
-const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
+const FaceDetector = ({ setUserFace, isImageCaptured, setIsImageCaptured }) => {
   const { colors } = useContext(ThemeContext);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -14,7 +14,7 @@ const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
   // Load face-api models
   useEffect(() => {
     const loadModels = async () => {
-      const MODEL_URL = '/models';
+      const MODEL_URL = "/models";
       await Promise.all([
         faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
         faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
@@ -35,7 +35,7 @@ const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
           videoRef.current.srcObject = stream;
         }
       } catch (err) {
-        console.error('Camera error:', err);
+        console.error("Camera error:", err);
       }
     };
 
@@ -46,7 +46,7 @@ const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
     // Cleanup when component unmounts
     return () => {
       if (stream) {
-        stream.getTracks().forEach(track => track.stop());
+        stream.getTracks().forEach((track) => track.stop());
       }
       clearInterval(intervalRef.current);
     };
@@ -68,7 +68,7 @@ const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
 
       setFaceScore(detection.detection.score);
 
-      const context = canvas.getContext('2d');
+      const context = canvas.getContext("2d");
       if (!context) return;
 
       canvas.width = video.videoWidth;
@@ -79,14 +79,14 @@ const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
         // await new Promise(resolve => setTimeout(resolve, 300));
 
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = canvas.toDataURL('image/png');
+        const imageData = canvas.toDataURL("image/png");
         setUserFace(imageData);
         setIsImageCaptured(true);
-        console.log('✅ Face Captured');
+        console.log("✅ Face Captured");
 
         // Stop webcam and interval
         if (video.srcObject) {
-          video.srcObject.getTracks().forEach(track => track.stop());
+          video.srcObject.getTracks().forEach((track) => track.stop());
           video.srcObject = null;
         }
         clearInterval(intervalRef.current);
@@ -96,7 +96,7 @@ const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
 
   return (
     <div
-      className="w-screen h-screen fixed"
+      className="w-screen h-screen fixed z-20"
       style={{
         backgroundColor: colors.background,
         color: colors.text,
@@ -104,14 +104,14 @@ const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
     >
       <Box
         sx={{
-          position: 'relative',
+          position: "relative",
           width: 300,
           height: 300,
-          borderRadius: '50%',
-          overflow: 'hidden',
-          border: faceScore > 0.79 ? '8px solid green' : '8px solid gray',
-          boxShadow: '0 0 15px rgba(0,0,0,0.2)',
-          mx: 'auto',
+          borderRadius: "50%",
+          overflow: "hidden",
+          border: faceScore > 0.79 ? "8px solid green" : "8px solid gray",
+          boxShadow: "0 0 15px rgba(0,0,0,0.2)",
+          mx: "auto",
           mt: 4,
         }}
       >
@@ -123,9 +123,9 @@ const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
           playsInline
           onPlay={handleVideoOnPlay}
           style={{
-            width: '100%',
-            height: '100%',
-            objectFit: 'cover',
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
           }}
         />
 
@@ -133,12 +133,12 @@ const FaceDetector = ({ setUserFace,isImageCaptured, setIsImageCaptured }) => {
         <canvas
           ref={canvasRef}
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
-            height: '100%',
-            visibility: 'hidden', // Hide blue lines or canvas
+            width: "100%",
+            height: "100%",
+            visibility: "hidden", // Hide blue lines or canvas
           }}
         />
       </Box>
