@@ -5,6 +5,7 @@ export const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState("light");
+  const [selectedOption,setSelectedOption] = useState(0)
 
   useEffect(() => {
     const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
@@ -25,7 +26,7 @@ export const ThemeProvider = ({ children }) => {
   const colors = COLORS[theme];
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme, colors }}>
+    <ThemeContext.Provider value={{ theme, toggleTheme, colors ,selectedOption,setSelectedOption}}>
       {children}
     </ThemeContext.Provider>
   );

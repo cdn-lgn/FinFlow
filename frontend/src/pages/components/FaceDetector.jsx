@@ -76,7 +76,7 @@ const FaceDetector = ({ setUserFace, isImageCaptured, setIsImageCaptured }) => {
       context.clearRect(0, 0, canvas.width, canvas.height);
 
       if (detection.detection.score > 0.79 && !isImageCaptured) {
-        // await new Promise(resolve => setTimeout(resolve, 300));
+        await new Promise(resolve => setTimeout(resolve, 100));
 
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
         const imageData = canvas.toDataURL("image/png");

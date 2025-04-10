@@ -15,7 +15,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import { ThemeContext } from '../../context/ThemeContext';
 
 const Sidebar = ({ role = "user" }) => {
-  const { colors } = useContext(ThemeContext);
+  const { colors,selectedOption,setSelectedOption } = useContext(ThemeContext);
 
   const items = {
     user: [
@@ -35,6 +35,10 @@ const Sidebar = ({ role = "user" }) => {
     ]
   };
 
+const handleSelectedItem=(e,index)=>{
+  setSelectedOption(index)
+}
+
   return (
     <Drawer
       variant="permanent"
@@ -45,6 +49,7 @@ const Sidebar = ({ role = "user" }) => {
           color: colors.text,
           width: 240,
           borderRight: `1px solid ${colors.primaryDark}`,
+          position:"static"
         }
       }}
     >
@@ -54,7 +59,9 @@ const Sidebar = ({ role = "user" }) => {
             <ListItem
               button
               key={index}
+              onClick={(e)=>{handleSelectedItem(e,index)}}
               sx={{
+                bgcolor:selectedOption===index ? colors.primary : "",
                 '&:hover': {
                   bgcolor: colors.primary,
                   color: "#fff",
@@ -64,7 +71,7 @@ const Sidebar = ({ role = "user" }) => {
                 }
               }}
             >
-              <ListItemIcon sx={{ color: colors.primary }}>{item.icon}</ListItemIcon>
+              <ListItemIcon sx={{ color: selectedOption===index ? colors.text : colors.primary }}>{item.icon}</ListItemIcon>
               <ListItemText primary={item.text} />
             </ListItem>
           ))}

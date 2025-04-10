@@ -5,16 +5,20 @@ import { ThemeProvider } from "./context/ThemeContext";
 import User from "./pages/User";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import NotFound from "./pages/NotFound";
+import Employee from "./pages/Employee";
 
 export default function App() {
   return (
-    <ThemeProvider> 
+    <ThemeProvider>
       <Router>
         <Routes>
           <Route path="/home" element={<Home />} />
           <Route path="/" element={<User/>}/>
+          <Route path="/employee" element={<Employee/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/register" element={<Signup/>}/>
+          <Route path="*" element={<NotFound/>}/>
         </Routes>
       </Router>
     </ThemeProvider>

@@ -55,7 +55,7 @@ const Signup = () => {
     alert("Account Created Successfully!");
   };
 
-  if (!userFace && !isImageCaptured) {
+  if ( !isImageCaptured) {
     return (
       <FaceDetector
         setUserFace={setUserFace}
