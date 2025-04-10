@@ -26,28 +26,28 @@
 
 #### **Libraries and Frameworks**:
 
-1. **React**: 
+1. **React**:
    - Main framework for building the **frontend UI** with a component-based structure.
 
-2. **Material UI (MUI)**: 
+2. **Material UI (MUI)**:
    - For **UI components** like buttons, cards, and forms, which makes the UI responsive and clean.
 
-3. **Framer Motion**: 
+3. **Framer Motion**:
    - Adds smooth animations for transitions and interactions on the frontend.
 
-4. **face-api.js**: 
+4. **face-api.js**:
    - Used for **face detection** during user registration, allowing users to capture their photo.
 
-5. **Axios**: 
+5. **Axios**:
    - Handles **HTTP requests** to the backend API (for registration, OTP verification, login).
 
-6. **React Router**: 
+6. **React Router**:
    - Manages **navigation** and routing between different pages like registration, login, and dashboard.
 
-7. **Formik/React Hook Form**: 
+7. **Formik/React Hook Form**:
    - For handling form validation and managing form states during registration and login.
 
-8. **Chart.js / Recharts**: 
+8. **Chart.js / Recharts**:
    - Used in the **Admin dashboard** to display data visualizations and charts for reports.
 
 ---
@@ -57,18 +57,19 @@
 You will use the following **OTP services**:
 
 1. **SMS OTP**:
-   - **Textlocal**: 
-     - **10 free SMS per day** (daily reset).
-     - Perfect for **India-based users** for SMS OTP-based verification.
-   - **Twilio**: 
-     - **$15 free credits** (approximately 200-300 OTPs).
-     - Twilio does not offer a daily reset of free credits but provides a good global solution for OTP.
-   
+- **TextLink SMS**:
+  - Send SMS using your own **Android device** with their app.
+  - Requires setup via [TextLink Dashboard](https://textlinksms.com/dashboard/your-devices/step-by-step).
+  - No official daily free limit, but **unlimited messages** can be sent via your own device.
+  - Great for **India-based users** who want to avoid paid APIs and use their own phone for OTP delivery.
+  - Note: Requires **Google Play Services** & the TextLink app installed on your Android device.
+
+
 2. **Email OTP**:
-   - **SendGrid**: 
+   - **SendGrid**:
      - **100 emails per day**, with **daily refill**.
      - Ideal for **email OTP-based verification** and small-scale use cases.
-   
+
 These services will be used for:
 - **OTP-based registration**: To verify user identity during account creation.
 - **OTP-based login**: For secure user login.
@@ -116,10 +117,10 @@ These services will be used for:
 1. **User Authentication Service**:
    - Manages **user registration** (email, mobile number, profile photo).
    - Handles **PIN validation** and **JWT token generation** for secure login.
-   
+
 2. **OTP Service**:
    - Manages the **generation, sending, and verification** of OTP codes using **SMS** (via Textlocal/Twilio) and **email** (via SendGrid).
-   
+
 3. **Employee Verification Service**:
    - Bank employees can **verify user details**, including **PAN card** and other personal information.
    - This service also handles account approval/rejection after employee validation.
@@ -182,7 +183,7 @@ These services will be used for:
 
 2. **JWT Authentication**:
    - **JWT tokens** will be used for user authentication, allowing users to securely access their accounts.
-   
+
 3. **Secure Connections**:
    - Use **HTTPS** to secure the communication between the frontend and backend.
 
