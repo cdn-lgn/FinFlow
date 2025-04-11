@@ -1,8 +1,10 @@
 import React, { useContext } from "react";
 import { motion } from "framer-motion";
 import { ThemeContext } from "../../context/ThemeContext";
+import { useNavigate } from "react-router-dom";
 
 function HeroSection() {
+  const navigate = useNavigate()
   const { theme, colors } = useContext(ThemeContext)
   return (
     <section
@@ -37,10 +39,10 @@ function HeroSection() {
           transition={{ duration: 1, delay: 0.6 }}
           className="mt-6 flex justify-center space-x-4"
         >
-          <button className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition">
+          <button className="px-6 py-3 bg-white text-blue-600 font-semibold rounded-lg shadow-md hover:bg-gray-200 transition" onClick={()=>navigate("/register")}>
             Create Account
           </button>
-          <button className="px-6 py-3 bg-yellow-400 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-500 transition">
+          <button className="px-6 py-3 bg-yellow-400 text-white font-semibold rounded-lg shadow-md hover:bg-yellow-500 transition" onClick={()=>navigate("/login")}>
             Go to Bank
           </button>
         </motion.div>

@@ -7,13 +7,6 @@ import FAQSection from "./components/FAQSection";
 import Footer from "./components/Footer";
 
 export default function Home() {
-  const {scrollY} = useScroll()
-  const {scrollX} = useScroll()
-
-  
-  useMotionValueEvent(scrollY, "change",(latest)=>{
-    console.log("vertical => ",latest,"|| Horizontal=> ",scrollX.get())
-   })
 
   return (
 <motion.div className="flex flex-col h-screen w-screen overflow-y-auto snap-y snap-mandatory scroll-smooth">
