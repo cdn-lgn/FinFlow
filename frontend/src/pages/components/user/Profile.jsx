@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
-import { Box, Typography, Avatar, Grid, Button, Paper } from "@mui/material";
 import { motion } from "framer-motion";
 import { ThemeContext } from "../../../context/ThemeContext";
+import { FaEdit } from "react-icons/fa";
 
 const Profile = () => {
   const { colors } = useContext(ThemeContext);
@@ -21,75 +21,61 @@ const Profile = () => {
       initial={{ opacity: 0, y: 30 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
+      className="p-4 w-full"
     >
-      <Box p={4} width="100%">
-        <Typography variant="h4" fontWeight={600} color={colors.primaryDark} mb={2}>
-          Profile 💁‍♂️
-        </Typography>
+      <h2 className="text-3xl font-semibold text-primary-dark mb-4">Profile 💁‍♂️</h2>
 
-        <Paper
-          elevation={4}
-          sx={{
-            bgcolor: colors.card,
-            color: colors.text,
-            p: 4,
-            borderRadius: 3,
-          }}
-        >
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={4} textAlign="center">
-              <Avatar
-                src={user.photo}
-                alt={user.name}
-                sx={{
-                  width: 120,
-                  height: 120,
-                  margin: "0 auto",
-                  border: `3px solid ${colors.primary}`,
-                }}
-              />
-              <Typography mt={2} fontWeight={600} fontSize={18}>
-                {user.name}
-              </Typography>
-              <Button
-                variant="contained"
-                sx={{ mt: 2, bgcolor: colors.primary }}
-              >
-                Edit Profile
-              </Button>
-            </Grid>
+      <div
+        className="bg-white p-4 rounded-3xl shadow-lg"
+        style={{
+          backgroundColor: colors.card,
+          color: colors.text,
+        }}
+      >
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Left side: Profile picture and Edit Button */}
+          <div className="text-center">
+            <img
+              src={user.photo}
+              alt={user.name}
+              className="w-30 h-30 rounded-full mx-auto border-4 border-primary mb-2"
+              style={{ borderColor: colors.primary }}
+            />
+            <h3 className="text-xl font-semibold mt-2">{user.name}</h3>
+            <button
+              className="mt-4 bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary-dark"
+              style={{
+                backgroundColor: colors.primary,
+                hover: { backgroundColor: colors.primaryDark },
+              }}
+            >
+              <FaEdit className="inline mr-2" /> Edit Profile
+            </button>
+          </div>
 
-            <Grid item xs={12} md={8}>
-              <Grid container spacing={2}>
-                <Grid item xs={6}>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Email
-                  </Typography>
-                  <Typography>{user.email}</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Phone
-                  </Typography>
-                  <Typography>{user.phone}</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    PAN Card
-                  </Typography>
-                  <Typography>{user.pan}</Typography>
-                </Grid>
-                <Grid item xs={6}>
-                  <Typography variant="subtitle2" fontWeight={600}>
-                    Date of Birth
-                  </Typography>
-                  <Typography>{user.dob}</Typography>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Paper>
-      </Box>
+          {/* Right side: User Info */}
+          <div className="col-span-2">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <p className="text-sm font-semibold">Email</p>
+                <p>{user.email}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Phone</p>
+                <p>{user.phone}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold">PAN Card</p>
+                <p>{user.pan}</p>
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Date of Birth</p>
+                <p>{user.dob}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 };

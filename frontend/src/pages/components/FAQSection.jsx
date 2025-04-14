@@ -1,62 +1,77 @@
-import React, { useContext } from "react";
-import {
-  Typography,
-  Accordion,
-  AccordionSummary,
-  AccordionDetails,
-  Box,
-  Container,
-} from "@mui/material";
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import React, { useContext, useState } from "react";
 import { ThemeContext } from "../../context/ThemeContext";
+import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const faqs = [
-    {
-      question: "How do I create an account on FinFlow?",
-      answer: "Just click the 'Create Account' button and fill out a few simple details."
-    },
-    {
-      question: "Is my data safe with FinFlow?",
-      answer: "Totally encrypted & locked tight."
-    },
-    {
-      question: "Do I need employee verification for transactions?",
-      answer: "Not for regular payments. Employee verification is for account approvals & support only."
-    },
-    {
-      question: "Is FinFlow free to use?",
-      answer: "Totally! No hidden fees, no tricks — just pure banking bliss 😌."
-    }
-  ];
-  
+  {
+    question: "How do I create an account on FinFlow?",
+    answer: "Just click the 'Create Account' button and fill out a few simple details.",
+  },
+  {
+    question: "Is my data safe with FinFlow?",
+    answer: "Totally encrypted & locked tight.",
+  },
+  {
+    question: "Do I need employee verification for transactions?",
+    answer: "Not for regular payments. Employee verification is for account approvals & support only.",
+  },
+  {
+    question: "Is FinFlow free to use?",
+    answer: "Totally! No hidden fees, no tricks — just pure banking bliss 😌.",
+  },
+];
 
 export default function FAQSection() {
   const { colors } = useContext(ThemeContext);
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggleFAQ = (index) => {
+    setOpenIndex(openIndex === index ? null : index);
+  };
 
   return (
-    <Box sx={{ py: 10, bgcolor: colors.background, color: colors.text }}>
-      <Container maxWidth="md">
-        <Typography variant="h4" align="center" fontWeight="bold" gutterBottom>
+    <section
+      className="py-12 px-4"
+      style={{ backgroundColor: colors.background, color: colors.text }}
+    >
+      <div className="max-w-3xl mx-auto">
+        <h2 className="text-4xl font-bold text-center mb-8">
           Frequently Asked <span style={{ color: colors.text }}>Questions</span>
-        </Typography>
+        </h2>
 
         {faqs.map((faq, index) => (
-          <Accordion key={index} sx={{ mb: 2, bgcolor: colors.card, color:colors.text }}>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls={`panel${index}-content`}
-              id={`panel${index}-header`}
+          <div
+            key={index}
+            className="mb-4 rounded-md border overflow-hidden transition-all duration-500 ease-in-out"
+            style={{
+              backgroundColor: colors.card,
+              borderColor: colors.primaryDark,
+            }}
+          >
+            <button
+              onClick={() => toggleFAQ(index)}
+              className="w-full flex justify-between items-center px-4 py-3 focus:outline-none"
             >
-              <Typography variant="subtitle1" fontWeight="600">
+              <span className="font-semibold text-left text-base">
                 {faq.question}
-              </Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Typography variant="body2">{faq.answer}</Typography>
-            </AccordionDetails>
-          </Accordion>
+              </span>
+              {openIndex === index ? (
+                <FaChevronUp className="text-sm" />
+              ) : (
+                <FaChevronDown className="text-sm" />
+              )}
+            </button>
+
+            <div
+              className={`px-4 text-sm text-gray-700 dark:text-gray-300 transition-all duration-500 ease-in-out ${
+                openIndex === index ? "max-h-[500px] py-3" : "max-h-0"
+              } overflow-hidden`}
+            >
+              {faq.answer}
+            </div>
+          </div>
         ))}
-      </Container>
-    </Box>
+      </div>
+    </section>
   );
 }

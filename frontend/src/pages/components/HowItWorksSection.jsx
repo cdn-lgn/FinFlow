@@ -1,24 +1,22 @@
 import React, { useContext } from "react";
-import { Box, Typography, Grid, Paper } from "@mui/material";
 import { motion } from "framer-motion";
-import PersonAddAltIcon from '@mui/icons-material/PersonAddAlt';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
-import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import { FaUserPlus, FaUserCheck } from 'react-icons/fa'; // React Icons
+import { CiBank } from "react-icons/ci";
 import { ThemeContext } from "../../context/ThemeContext";
 
 const steps = [
   {
-    icon: <PersonAddAltIcon fontSize="large" />,
+    icon: <FaUserPlus size={40} />,
     title: "Create Account",
     desc: "Sign up with your email & secure password.",
   },
   {
-    icon: <VerifiedUserIcon fontSize="large" />,
+    icon: <FaUserCheck size={40} />,
     title: "Employee Verification",
     desc: "Our staff verifies your identity manually.",
   },
   {
-    icon: <AccountBalanceIcon fontSize="large" />,
+    icon:<CiBank size={40} />,
     title: "Start Banking",
     desc: "Send, receive & manage funds securely.",
   },
@@ -28,45 +26,32 @@ export default function HowItWorksSection() {
   const { colors } = useContext(ThemeContext);
 
   return (
-    <Box sx={{ py: 10, px: 4, bgcolor: colors.background, color: colors.text }}>
-      <Typography variant="h4" align="center" fontWeight="bold" gutterBottom>
-        How <span style={{ color: colors.primary }}>FinFlow</span> Works
-      </Typography>
+    <div className={`py-10 px-4 bg-${colors.background} text-${colors.text}`}>
+      <h4 className="text-3xl font-bold text-center mb-8">
+        How <span className={`text-${colors.primary}`}>FinFlow</span> Works
+      </h4>
 
-      <Grid container spacing={4} justifyContent="center" sx={{ mt: 4 }}>
+      <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8 justify-center">
         {steps.map((step, index) => (
-          <Grid key={index} item xs={12} sm={6} md={4}>
-            <motion.div
-              initial={{ opacity: 0, y: 50 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
+          <motion.div
+            key={index}
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: index * 0.2 }}
+          >
+            <div
+              className={`p-6 text-center rounded-xl bg-${colors.card} text-${colors.text} transition-all duration-300 transform hover:scale-105 hover:shadow-lg`}
             >
-              <Paper
-                elevation={4}
-                sx={{
-                  p: 4,
-                  textAlign: "center",
-                  borderRadius: 4,
-                  bgcolor: colors.card,
-                  color: colors.text,
-                  transition: "0.3s",
-                  "&:hover": {
-                    boxShadow: `0 0 12px ${colors.primary}`,
-                    transform: "scale(1.03)",
-                  },
-                }}
-              >
-                <Box mb={2} sx={{ color: colors.primary }}>
-                  {step.icon}
-                </Box>
-                <Typography variant="h6" fontWeight="600">{step.title}</Typography>
-                <Typography variant="body2" mt={2}>{step.desc}</Typography>
-              </Paper>
-            </motion.div>
-          </Grid>
+              <div className={`mb-4 text-${colors.primary}`}>
+                {step.icon}
+              </div>
+              <h6 className="text-xl font-semibold">{step.title}</h6>
+              <p className="mt-2 text-sm">{step.desc}</p>
+            </div>
+          </motion.div>
         ))}
-      </Grid>
-    </Box>
+      </div>
+    </div>
   );
 }

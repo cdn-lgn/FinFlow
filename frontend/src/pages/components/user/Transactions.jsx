@@ -1,13 +1,7 @@
 import React, { useContext, useState } from "react";
-import {
-  Box,
-  Typography,
-  Paper,
-  Tabs,
-  Tab
-} from "@mui/material";
-import { ThemeContext } from "../../../context/ThemeContext";
 import { motion } from "framer-motion";
+import { ThemeContext } from "../../../context/ThemeContext";
+import { FaMoneyBillWave, FaRegArrowAltCircleUp } from "react-icons/fa";
 
 // Dummy Data
 const dummyTransactions = [
@@ -18,48 +12,41 @@ const dummyTransactions = [
 
 // Components inside Tabs
 const TransactionTable = ({ colors }) => (
-  <Paper
-    elevation={3}
-    sx={{ bgcolor: colors.card, color: colors.text, overflowX: "auto" }}
-  >
-    <Box p={2}>
-      <Typography variant="h6" gutterBottom sx={{color:colors.text}}>
-        All Transactions
-      </Typography>
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th align="left">ID</th>
-            <th align="left">Date</th>
-            <th align="left">Amount</th>
-            <th align="left">Type</th>
-            <th align="left">Status</th>
+  <div className={`bg-${colors.card} text-${colors.text} overflow-x-auto p-4 rounded-xl`}>
+    <h2 className={`text-xl font-semibold text-${colors.text} mb-4`}>All Transactions</h2>
+    <table className="min-w-full table-auto">
+      <thead>
+        <tr>
+          <th className="text-left px-4 py-2">ID</th>
+          <th className="text-left px-4 py-2">Date</th>
+          <th className="text-left px-4 py-2">Amount</th>
+          <th className="text-left px-4 py-2">Type</th>
+          <th className="text-left px-4 py-2">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {dummyTransactions.map((txn) => (
+          <tr key={txn.id}>
+            <td className="px-4 py-2">{txn.id}</td>
+            <td className="px-4 py-2">{txn.date}</td>
+            <td className="px-4 py-2">₹{txn.amount}</td>
+            <td className="px-4 py-2">{txn.type}</td>
+            <td
+              className={`px-4 py-2 font-semibold ${
+                txn.status === "Success"
+                  ? `text-${colors.success}`
+                  : txn.status === "Pending"
+                  ? `text-${colors.warning}`
+                  : `text-${colors.danger}`
+              }`}
+            >
+              {txn.status}
+            </td>
           </tr>
-        </thead>
-        <tbody>
-          {dummyTransactions.map((txn) => (
-            <tr key={txn.id}>
-              <td>{txn.id}</td>
-              <td>{txn.date}</td>
-              <td>₹{txn.amount}</td>
-              <td>{txn.type}</td>
-              <td style={{
-                color:
-                  txn.status === "Success"
-                    ? colors.success
-                    : txn.status === "Pending"
-                    ? colors.warning
-                    : colors.danger,
-                fontWeight: 600,
-              }}>
-                {txn.status}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </Box>
-  </Paper>
+        ))}
+      </tbody>
+    </table>
+  </div>
 );
 
 const SendMoney = ({ colors }) => (
@@ -69,18 +56,12 @@ const SendMoney = ({ colors }) => (
     exit={{ opacity: 0, x: -50 }}
     transition={{ duration: 0.5 }}
   >
-    <Box
-      p={3}
-      bgcolor={colors.card}
-      color={colors.text}
-      borderRadius={2}
-      boxShadow={3}
+    <div
+      className={`bg-${colors.card} text-${colors.text} p-4 rounded-xl shadow-lg`}
     >
-      <Typography variant="h6" sx={{color:colors.text}}>Send Money 🤑</Typography>
-      <Typography mt={1} fontSize={14}>
-        (Form coming soon...)
-      </Typography>
-    </Box>
+      <h3 className={`text-xl font-semibold text-${colors.text}`}>Send Money 🤑</h3>
+      <p className="mt-1 text-sm">(Form coming soon...)</p>
+    </div>
   </motion.div>
 );
 
@@ -91,18 +72,12 @@ const RaiseFund = ({ colors }) => (
     exit={{ opacity: 0, x: 50 }}
     transition={{ duration: 0.5 }}
   >
-    <Box
-      p={3}
-      bgcolor={colors.card}
-      color={colors.text}
-      borderRadius={2}
-      boxShadow={3}
+    <div
+      className={`bg-${colors.card} text-${colors.text} p-4 rounded-xl shadow-lg`}
     >
-      <Typography variant="h6">Raise Fund 🙌</Typography>
-      <Typography mt={1} fontSize={14}>
-        (Raise funds feature coming soon...)
-      </Typography>
-    </Box>
+      <h3 className="text-xl font-semibold">Raise Fund 🙌</h3>
+      <p className="mt-1 text-sm">(Raise funds feature coming soon...)</p>
+    </div>
   </motion.div>
 );
 
@@ -110,7 +85,7 @@ const Transactions = () => {
   const { colors } = useContext(ThemeContext);
   const [tab, setTab] = useState(0);
 
-  const handleTabChange = (_, newTab) => setTab(newTab);
+  const handleTabChange = (newTab) => setTab(newTab);
 
   return (
     <motion.div
@@ -118,25 +93,45 @@ const Transactions = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -30 }}
       transition={{ duration: 0.5 }}
+      className="p-4 w-full"
     >
-      <Box p={4} width="100%">
-        <Typography variant="h4" fontWeight={600} color={colors.text} mb={2}>
-          Transactions Section 💸
-        </Typography>
+      <h2 className={`text-3xl font-semibold text-${colors.text} mb-4`}>
+        Transactions Section 💸
+      </h2>
 
-        {/* Tabs */}
-        <Tabs value={tab} onChange={handleTabChange} textColor="primary" indicatorColor="primary">
-          <Tab label="View Transactions" sx={{color:colors.text}} />
-          <Tab label="Send Money" sx={{color:colors.text}} />
-          <Tab label="Raise Fund" sx={{color:colors.text}} />
-        </Tabs>
+      {/* Tabs */}
+      <div className="flex space-x-4 mb-6">
+        <button
+          onClick={() => handleTabChange(0)}
+          className={`${
+            tab === 0 ? "text-primary border-b-2 border-primary" : "text-gray-500"
+          } text-lg font-medium py-2 px-4`}
+        >
+          View Transactions
+        </button>
+        <button
+          onClick={() => handleTabChange(1)}
+          className={`${
+            tab === 1 ? "text-primary border-b-2 border-primary" : "text-gray-500"
+          } text-lg font-medium py-2 px-4`}
+        >
+          Send Money <FaMoneyBillWave className="inline-block ml-1" />
+        </button>
+        <button
+          onClick={() => handleTabChange(2)}
+          className={`${
+            tab === 2 ? "text-primary border-b-2 border-primary" : "text-gray-500"
+          } text-lg font-medium py-2 px-4`}
+        >
+          Raise Fund <FaRegArrowAltCircleUp className="inline-block ml-1" />
+        </button>
+      </div>
 
-        <Box mt={3}>
-          {tab === 0 && <TransactionTable colors={colors} />}
-          {tab === 1 && <SendMoney colors={colors} />}
-          {tab === 2 && <RaiseFund colors={colors} />}
-        </Box>
-      </Box>
+      <div>
+        {tab === 0 && <TransactionTable colors={colors} />}
+        {tab === 1 && <SendMoney colors={colors} />}
+        {tab === 2 && <RaiseFund colors={colors} />}
+      </div>
     </motion.div>
   );
 };

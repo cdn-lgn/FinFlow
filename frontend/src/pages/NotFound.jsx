@@ -1,7 +1,6 @@
-import React from "react";
-import { Box, Typography, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 const NotFound = () => {
   const navigate = useNavigate();
@@ -11,28 +10,15 @@ const NotFound = () => {
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
-      transition={{ duration: 0.6, ease: "easeInOut" }}
+      transition={{ duration: 0.6, ease: 'easeInOut' }}
     >
-      <Box
-        sx={{
-          minHeight: "100vh",
-          backgroundColor: "#f8f9fa",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          textAlign: "center",
-          px: 2,
-        }}
-      >
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-center px-4">
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 120, delay: 0.3 }}
+          transition={{ type: 'spring', stiffness: 120, delay: 0.3 }}
         >
-          <Typography variant="h1" color="primary" fontWeight="bold">
-            404
-          </Typography>
+          <h1 className="text-6xl font-bold text-blue-600">404</h1>
         </motion.div>
 
         <motion.div
@@ -40,23 +26,15 @@ const NotFound = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.6 }}
         >
-          <Typography variant="h5" mt={2} mb={2}>
-            Oops! Page not found 😢
-          </Typography>
-          <Button
-            variant="contained"
-            onClick={() => navigate("/")}
-            sx={{
-              backgroundColor: "#007BFF",
-              "&:hover": {
-                backgroundColor: "#0056b3",
-              },
-            }}
+          <h5 className="mt-2 mb-4 text-xl text-gray-700">Oops! Page not found 😢</h5>
+          <button
+            onClick={() => navigate('/')}
+            className="px-6 py-3 text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
           >
             Go to Home
-          </Button>
+          </button>
         </motion.div>
-      </Box>
+      </div>
     </motion.div>
   );
 };

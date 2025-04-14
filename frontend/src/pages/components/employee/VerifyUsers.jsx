@@ -1,14 +1,7 @@
 import React, { useContext, useState } from 'react';
-import {
-  Box,
-  Typography,
-  Paper,
-  Button,
-  Avatar,
-  Grid,
-} from '@mui/material';
 import { motion } from 'framer-motion';
 import { ThemeContext } from '../../../context/ThemeContext';
+import { FaUserCircle } from 'react-icons/fa';
 
 const dummyUsers = [
   {
@@ -32,83 +25,53 @@ const VerifyUsers = () => {
   const [users, setUsers] = useState(dummyUsers);
 
   const handleVerify = (id) => {
-    const updated = users.map(user =>
-      user.id === id ? { ...user, status: "verified" } : user
+    const updated = users.map((user) =>
+      user.id === id ? { ...user, status: 'verified' } : user
     );
     setUsers(updated);
   };
 
   return (
-    <Box
-      component={motion.div}
+    <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      sx={{
-        flexGrow: 1,
-        p: 4,
-        width: '100%',
-        overflowY: 'auto',
-      }}
+      className="flex-grow p-4 w-full overflow-y-auto"
     >
-      <Typography variant="h4" fontWeight={600} mb={4}>
-        Verify Users ✅
-      </Typography>
+      <h2 className="text-3xl font-semibold mb-4 text-gray-800">Verify Users ✅</h2>
 
-      <Grid container spacing={3}>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {users.map((user) => (
-          <Grid item xs={12} md={6} key={user.id}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 3,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 2,
-                borderRadius: 3,
-                backgroundColor: colors.card,
-                color: colors.text,
-              }}
-              component={motion.div}
-              whileHover={{ scale: 1.02 }}
-            >
-              <Avatar
+          <div key={user.id} className="p-4 bg-white rounded-lg shadow-md hover:scale-102">
+            <div className="flex items-center gap-4">
+              <img
                 src={user.photo}
                 alt={user.name}
-                sx={{ width: 56, height: 56 }}
+                className="w-14 h-14 rounded-full object-cover"
               />
-              <Box flexGrow={1}>
-                <Typography variant="h6">{user.name}</Typography>
-                <Typography variant="body2" color="text.secondary">
-                  {user.email}
-                </Typography>
-              </Box>
-              {user.status === "pending" ? (
-                <Button
-                  variant="contained"
-                  sx={{
-                    backgroundColor: colors.primary,
-                    "&:hover": {
-                      backgroundColor: colors.primaryDark,
-                    },
-                  }}
+              <div className="flex-grow">
+                <h3 className="text-xl font-semibold text-gray-800">{user.name}</h3>
+                <p className="text-sm text-gray-500">{user.email}</p>
+              </div>
+              {user.status === 'pending' ? (
+                <button
                   onClick={() => handleVerify(user.id)}
+                  className={`bg-${colors.primary} hover:bg-${colors.primaryDark} text-white px-4 py-2 rounded-lg`}
                 >
                   Verify
-                </Button>
+                </button>
               ) : (
-                <Typography
-                  variant="body2"
-                  sx={{ color: colors.success, fontWeight: 600 }}
+                <span
+                  className="text-green-500 font-semibold"
                 >
                   Verified
-                </Typography>
+                </span>
               )}
-            </Paper>
-          </Grid>
+            </div>
+          </div>
         ))}
-      </Grid>
-    </Box>
+      </div>
+    </motion.div>
   );
 };
 

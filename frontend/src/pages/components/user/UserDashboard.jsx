@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Typography, Box } from '@mui/material';
+import { FaUserCircle } from 'react-icons/fa';
 
 const UserDashboard = () => {
   return (
@@ -9,15 +9,20 @@ const UserDashboard = () => {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 50 }}
       transition={{ duration: 0.6, ease: 'easeOut' }}
+      className="p-4"
     >
-      <Box sx={{ p: 4 }}>
-        <Typography variant="h4" fontWeight={600} mb={2}>
+      <div>
+        <h2 className="text-4xl font-semibold mb-2 text-gray-800">
           Welcome to your UserDashboard 💼
-        </Typography>
-        <Typography>
+        </h2>
+        <p className="text-lg text-gray-600">
           Yahan se tu apne transactions, profile, aur baaki sab kuch dekh sakta hai... bilkul boss jaisa 😎
-        </Typography>
-      </Box>
+        </p>
+      </div>
+      <div className="flex items-center mt-4">
+        <FaUserCircle className="text-gray-500 text-5xl" />
+        <span className="ml-2 text-lg text-gray-800">User Profile</span>
+      </div>
     </motion.div>
   );
 };

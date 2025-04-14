@@ -1,93 +1,68 @@
 import React, { useContext } from "react";
-import { Typography, Box, Grid, Paper } from "@mui/material";
-import CreditCardIcon from '@mui/icons-material/CreditCard';
-import LockIcon from '@mui/icons-material/Lock';
-import BoltIcon from '@mui/icons-material/Bolt';
-import QueryStatsIcon from '@mui/icons-material/QueryStats';
-import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
+import {
+  FaCreditCard,
+  FaLock,
+  FaBolt,
+  FaChartLine,
+  FaUserCheck,
+} from "react-icons/fa";
 import { ThemeContext } from "../../context/ThemeContext";
 
 export default function FeaturesSection() {
   const { colors } = useContext(ThemeContext);
 
-  const iconProps = {
-    fontSize: "large",
-    sx: { color: colors.primary },
-  };
-
   const features = [
     {
-      icon: <CreditCardIcon {...iconProps} />,
+      icon: <FaCreditCard size={32} color={colors.primary} />,
       title: "Virtual Banking",
       desc: "No physical cards, 100% online experience.",
     },
     {
-      icon: <LockIcon {...iconProps} />,
+      icon: <FaLock size={32} color={colors.primary} />,
       title: "Encrypted & Secure",
       desc: "Your data is safe & sound, just like your secrets 😉",
     },
     {
-      icon: <BoltIcon {...iconProps} />,
+      icon: <FaBolt size={32} color={colors.primary} />,
       title: "Instant Transfers",
       desc: "Lightning fast money moves ⚡",
     },
     {
-      icon: <QueryStatsIcon {...iconProps} />,
+      icon: <FaChartLine size={32} color={colors.primary} />,
       title: "Real-time Analytics",
       desc: "Keep track of your finances live.",
     },
     {
-      icon: <VerifiedUserIcon {...iconProps} />,
+      icon: <FaUserCheck size={32} color={colors.primary} />,
       title: "Employee Verification",
       desc: "Verified support when you need it.",
     },
   ];
 
   return (
-    <Box
-      sx={{
-        py: 10,
-        bgcolor: colors.background,
-        color: colors.text,
-        minHeight: "100vh",
-      }}
+    <section
+      className="py-16 px-4 min-h-screen"
+      style={{ backgroundColor: colors.background, color: colors.text }}
     >
-      <Typography variant="h4" align="center" fontWeight="bold" gutterBottom>
+      <h2 className="text-4xl font-bold text-center">
         Why Choose <span style={{ color: colors.primary }}>FinFlow</span>?
-      </Typography>
+      </h2>
 
-      <Grid container spacing={4} justifyContent="center" sx={{ px: 4, mt: 4 }}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-12 max-w-6xl mx-auto">
         {features.map((item, index) => (
-          <Grid key={index} item xs={12} sm={6} md={4} lg={3}>
-            <Paper
-              elevation={3}
-              sx={{
-                p: 4,
-                textAlign: "center",
-                borderRadius: 4,
-                bgcolor: colors.card,
-                color: colors.text,
-                transition: "0.3s",
-                "&:hover": {
-                  boxShadow: `0 0 15px ${colors.primary}`,
-                  transform: "scale(1.05)",
-                },
-              }}
-            >
-              <Box mb={3}>{item.icon}</Box>
-              <Typography variant="h6" fontWeight="600">
-                {item.title}
-              </Typography>
-              <Typography
-                variant="body2"
-                sx={{ color: colors.text, mt: 2 }}
-              >
-                {item.desc}
-              </Typography>
-            </Paper>
-          </Grid>
+          <div
+            key={index}
+            className="bg-white dark:bg-gray-800 rounded-xl p-6 text-center shadow-md transform transition duration-300 hover:scale-105 hover:shadow-lg"
+            style={{ backgroundColor: colors.card, color: colors.text }}
+          >
+            <div className="mb-4 flex justify-center">{item.icon}</div>
+            <h3 className="text-lg font-semibold">{item.title}</h3>
+            <p className="text-sm mt-2 text-gray-700 dark:text-gray-300">
+              {item.desc}
+            </p>
+          </div>
         ))}
-      </Grid>
-    </Box>
+      </div>
+    </section>
   );
 }

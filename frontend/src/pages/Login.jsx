@@ -1,11 +1,5 @@
-// File: src/pages/Login.jsx
-
 import React, { useContext, useState } from 'react';
-import {
-  Box, TextField, Button, Typography, InputAdornment,
-  IconButton, Paper, MenuItem, Select, FormControl, InputLabel
-} from '@mui/material';
-import { Visibility, VisibilityOff } from '@mui/icons-material';
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // React Icons
 import { ThemeContext } from '../context/ThemeContext';
 
 const Login = () => {
@@ -21,109 +15,72 @@ const Login = () => {
     : '/logo-transparent.png';
 
   return (
-    <Box
-      className="h-screen w-screen flex items-center justify-center"
-      sx={{ bgcolor: colors.background, color: colors.text }}
-    >
-      <Paper
-        elevation={4}
-        sx={{
-          p: 4,
-          borderRadius: 3,
-          width: '90%',
-          maxWidth: 400,
-          bgcolor: colors.card,
-        }}
-      >
+    <div className={`h-screen w-screen flex items-center justify-center bg-${colors.background} text-${colors.text}`}>
+      <div className={`p-8 rounded-3xl w-full max-w-sm bg-${colors.card}`}>
         {/* Logo */}
-        <Box sx={{ textAlign: 'center', mb: 3 }}>
-          <img
-            src={logoPath}
-            alt="FinFlow Logo"
-            style={{ width: '100px', marginBottom: 8 }}
-          />
-          <Typography variant="h5" fontWeight="bold">
-            Login to <span style={{ color: colors.primary }}>FinFlow</span>
-          </Typography>
-        </Box>
+        <div className="text-center mb-8">
+          <img src={logoPath} alt="FinFlow Logo" className="w-24 mb-4" />
+          <h5 className={`font-bold text-xl`}>
+            Login to <span className={`text-${colors.primary}`}>FinFlow</span>
+          </h5>
+        </div>
 
         {/* Email */}
-        <TextField
-          label="Email"
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          InputLabelProps={{ style: { color: colors.text } }}
-          InputProps={{
-            style: { color: colors.text },
-          }}
-        />
+        <div className="mb-4">
+          <label htmlFor="email" className={`block text-sm mb-1 text-${colors.text}`}>Email</label>
+          <input
+            id="email"
+            type="email"
+            placeholder="Enter your email"
+            className={`w-full p-3 rounded-md border border-${colors.primaryDark} bg-transparent text-${colors.text}`}
+          />
+        </div>
 
         {/* Password */}
-        <TextField
-          label="Password"
-          type={showPassword ? 'text' : 'password'}
-          variant="outlined"
-          fullWidth
-          margin="normal"
-          InputLabelProps={{ style: { color: colors.text } }}
-          InputProps={{
-            style: { color: colors.text },
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton onClick={handleClickShowPassword}>
-                  {showPassword ? <VisibilityOff /> : <Visibility />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-        />
+        <div className="mb-4">
+          <label htmlFor="password" className={`block text-sm mb-1 text-${colors.text}`}>Password</label>
+          <div className="relative">
+            <input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Enter your password"
+              className={`w-full p-3 rounded-md border border-${colors.primaryDark} bg-transparent text-${colors.text}`}
+            />
+            <div className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer" onClick={handleClickShowPassword}>
+              {showPassword ? <FaEyeSlash size={20} className={`text-${colors.text}`} /> : <FaEye size={20} className={`text-${colors.text}`} />}
+            </div>
+          </div>
+        </div>
 
         {/* Role Selector */}
-        <FormControl fullWidth margin="normal">
-          <InputLabel sx={{ color: colors.text }}>Select Role</InputLabel>
-          <Select
+        <div className="mb-4">
+          <label htmlFor="role" className={`block text-sm mb-1 text-${colors.text}`}>Select Role</label>
+          <select
+            id="role"
             value={role}
             onChange={handleRoleChange}
-            label="Select Role"
-            sx={{
-              color: colors.text,
-              '.MuiOutlinedInput-notchedOutline': { borderColor: colors.primaryDark },
-              '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: colors.primary },
-              '.MuiSvgIcon-root ': { fill: colors.text }
-            }}
+            className={`w-full p-3 rounded-md border border-${colors.primaryDark} bg-transparent text-${colors.text}`}
           >
-            <MenuItem value="user">User</MenuItem>
-            <MenuItem value="employee">Employee</MenuItem>
-            <MenuItem value="admin">Admin</MenuItem>
-          </Select>
-        </FormControl>
+            <option value="user">User</option>
+            <option value="employee">Employee</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
 
         {/* Login Button */}
-        <Button
-          variant="contained"
-          fullWidth
-          sx={{
-            mt: 2,
-            bgcolor: colors.primary,
-            color: "#fff",
-            '&:hover': { bgcolor: colors.primaryDark }
-          }}
+        <button
+          className={`w-full py-3 rounded-md bg-${colors.primary} text-white hover:bg-${colors.primaryDark}`}
         >
           Login as {role.charAt(0).toUpperCase() + role.slice(1)}
-        </Button>
+        </button>
 
         {/* Footer Actions */}
-        <Box mt={2} display="flex" justifyContent="space-between">
-          <Typography variant="body2" sx={{ color: colors.text, cursor: 'pointer' }}>
-            Forgot Password?
-          </Typography>
-          <Typography variant="body2" sx={{ color: colors.text, cursor: 'pointer' }}>
-            Create Account
-          </Typography>
-        </Box>
-      </Paper>
-    </Box>
+        <div className="mt-4 flex justify-between text-sm text-${colors.text}">
+          <span className="cursor-pointer">Forgot Password?</span>
+          <span className="cursor-pointer">Create Account</span>
+        </div>
+      </div>
+    </div>
   );
 };
 

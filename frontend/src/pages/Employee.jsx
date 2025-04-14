@@ -1,5 +1,4 @@
 import React, { useContext } from 'react';
-import { Box } from '@mui/material';
 import Sidebar from './components/Sidebar';
 import { ThemeContext } from '../context/ThemeContext';
 
@@ -12,21 +11,15 @@ const Employee = () => {
   const { colors, selectedOption } = useContext(ThemeContext);
 
   return (
-    <Box
-      sx={{
-        bgcolor: colors.background,
-        color: colors.text,
-        display: 'flex',
-        height: '100vh',
-        width: '100vw',
-        overflow: 'hidden',
-      }}
-    >
+    <div className={`bg-${colors.background} text-${colors.text} flex h-screen w-full overflow-hidden`}>
       <Sidebar role="employee" />
-      {selectedOption === 0 && <EmployeeDashboard />}
-      {selectedOption === 1 && <VerifyUsers />}
-      {selectedOption === 2 && <UserList />}
-    </Box>
+
+      <div className="flex-1 p-4">
+        {selectedOption === 0 && <EmployeeDashboard />}
+        {selectedOption === 1 && <VerifyUsers />}
+        {selectedOption === 2 && <UserList />}
+      </div>
+    </div>
   );
 };
 
