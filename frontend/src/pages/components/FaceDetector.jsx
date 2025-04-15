@@ -72,8 +72,7 @@ const FaceDetector = ({ setUserFace, isImageCaptured, setIsImageCaptured }) => {
         const imageData = canvas.toBlob((blob) => {
           const imageFile = new File([blob], "face-image.png", {
             type: "image/png",
-          }
-        );
+          });
           setUserFace(imageFile); // real file now
         });
 

@@ -3,10 +3,11 @@ import FaceDetector from "./components/FaceDetector";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { motion } from "framer-motion";
 import axiosClient from "../utils/axiosClient";
+import OtpVerify from "./components/OtpVerify";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     fatherName: "",
     dob: "",
     mobile: "",
@@ -25,6 +26,8 @@ const Signup = () => {
   const [mobileVerified, setMobileVerified] = useState(false);
   const [emailVerified, setEmailVerified] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [showOtpModal, setShowOtpModal] = useState(false);
+  const [otpTarget, setOtpTarget] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isImageCaptured, setIsImageCaptured] = useState(true);
   const [dobError, setDobError] = useState("");
@@ -83,9 +86,20 @@ const Signup = () => {
   };
 
   const handleVerify = (field) => {
-    if (field === "mobile") setMobileVerified(true);
-    else if (field === "email") setEmailVerified(true);
+    if (field != "") setShowOtpModal(true);
+    setOtpTarget(Number(field) ? Number(field):field)
   };
+  if (showOtpModal && otpTarget) {
+    return (
+      <OtpVerify
+        sendTo={otpTarget}
+        setMobileVerified={setMobileVerified}
+        setEmailVerified={setEmailVerified}
+        onClose={() => setShowOtpModal(false)}
+      />
+    );
+  }
+
 
   const handleSubmit = async () => {
     if (!validateDOB(formData.dob)) return;
@@ -93,7 +107,7 @@ const Signup = () => {
     const form = new FormData();
 
     for (const key in formData) {
-      if (typeof formData[key] === 'object') {
+      if (typeof formData[key] === "object") {
         form.append(key, JSON.stringify(formData[key]));
       } else {
         form.append(key, formData[key]);
@@ -104,18 +118,15 @@ const Signup = () => {
     }
 
     try {
-      const response = await axiosClient.post("/api/v1/user/registration", form);
-
-      form.forEach((value, key) => {
-        console.log(`${key}:`, value);
-      });
-
+      const response = await axiosClient.post(
+        "/api/v1/user/registration",
+        form
+      );
       console.log("✅ Server Response:", response.data);
     } catch (error) {
       console.error("❌ Upload Error:", error);
     }
   };
-
 
   const isFormValid =
     Object.values(formData).every((val) => val !== "") &&
@@ -152,9 +163,9 @@ const Signup = () => {
           <div className="grid md:grid-cols-1 gap-6">
             <input
               type="text"
-              name="name"
+              name="fullName"
               placeholder="Full Name"
-              value={formData.name}
+              value={formData.fullName}
               onChange={handleChange}
               className="input"
             />
@@ -238,7 +249,7 @@ const Signup = () => {
                 className="input"
               />
               <button
-                onClick={() => handleVerify("mobile")}
+                onClick={() => handleVerify(formData.mobile)}
                 className={`btn text-white ${
                   mobileVerified ? "bg-green-500" : "bg-blue-500"
                 }`}
@@ -256,7 +267,7 @@ const Signup = () => {
                 className="input"
               />
               <button
-                onClick={() => handleVerify("email")}
+                onClick={() => handleVerify(formData.email)}
                 className={`text-white btn  ${
                   emailVerified ? "bg-green-500" : "bg-blue-500"
                 }`}

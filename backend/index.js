@@ -20,13 +20,13 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 if (environment == "development") {
   app.use((req, res, next) => {
-    console.log("Req from frontend for route : ", req.url);
-    console.log("Method : ", req.method);
+    console.log("✅ Req from frontend for route : ", req.url);
+    console.log("✅ Method : ", req.method);
     next();
   });
 }
 
-const API_PREFIX = '/api/v1'
+const API_PREFIX = "/api/v1";
 app.use(`${API_PREFIX}/user`, userRouter);
 
 app.get("/", (req, res) => {
@@ -36,6 +36,6 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`✅ FinFlow Server Started on port ${PORT}`);
-  environment === "development" && console.log("✅ Development Mode Enabled 🧪");
+  environment === "development" &&
+    console.log("✅ Development Mode Enabled 🧪");
 });
-
