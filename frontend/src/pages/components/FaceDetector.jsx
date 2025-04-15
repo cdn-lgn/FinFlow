@@ -69,7 +69,14 @@ const FaceDetector = ({ setUserFace, isImageCaptured, setIsImageCaptured }) => {
       if (detection.detection.score > 0.79 && !isImageCaptured) {
         await new Promise((resolve) => setTimeout(resolve, 100));
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
-        const imageData = canvas.toDataURL("image/png");
+        const imageData = canvas.toBlob((blob) => {
+          const imageFile = new File([blob], "face-image.png", {
+            type: "image/png",
+          }
+        );
+          setUserFace(imageFile); // real file now
+        });
+
         setUserFace(imageData);
         setIsImageCaptured(true);
         console.log("✅ Face Captured");

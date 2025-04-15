@@ -19,35 +19,82 @@ export default function Home() {
   };
 
   const features = [
-    { icon: <FaCreditCard size={40} />, title: "Virtual Banking", desc: "No physical cards, 100% online experience." },
-    { icon: <FaLock size={40} />, title: "Encrypted & Secure", desc: "Your data is safe & sound, just like your secrets 😉" },
-    { icon: <FaBolt size={40} />, title: "Instant Transfers", desc: "Lightning fast money moves ⚡" },
-    { icon: <FaChartLine size={40} />, title: "Real-time Analytics", desc: "Keep track of your finances live." },
-    { icon: <FaShieldAlt size={40} />, title: "Employee Verification", desc: "Verified support when you need it." },
+    {
+      icon: <FaCreditCard size={40} />,
+      title: "Virtual Banking",
+      desc: "Experience a fully digital banking platform—no physical cards required."
+    },
+    {
+      icon: <FaLock size={40} />,
+      title: "Encrypted & Secure",
+      desc: "Advanced encryption keeps your data private, secure, and fully protected."
+    },
+    {
+      icon: <FaBolt size={40} />,
+      title: "Instant Transfers",
+      desc: "Transfer funds in real time with high-speed, hassle-free transactions."
+    },
+    {
+      icon: <FaChartLine size={40} />,
+      title: "Real-time Analytics",
+      desc: "Track your spending and savings with live financial insights and dashboards."
+    },
+    {
+      icon: <FaShieldAlt size={40} />,
+      title: "Employee Verification",
+      desc: "Our verified team members ensure safe, human-powered support and onboarding."
+    }
   ];
+
 
   const steps = [
-    { icon: <FaUserPlus size={40} />, title: "Create Account", desc: "Sign up with your email & secure password." },
-    { icon: <FaUserCheck size={40} />, title: "Employee Verification", desc: "Our staff verifies your identity manually." },
-    { icon: <CiBank size={40} />, title: "Start Banking", desc: "Send, receive & manage funds securely." },
+    {
+      icon: <FaUserPlus size={40} />,
+      title: "Create Account",
+      desc: "Register using your email and a secure password in just a few simple steps."
+    },
+    {
+      icon: <FaUserCheck size={40} />,
+      title: "Identity Verification",
+      desc: "Our team securely verifies your identity to ensure a trusted banking environment."
+    },
+    {
+      icon: <CiBank size={40} />,
+      title: "Start Banking",
+      desc: "Access all features—send, receive, and manage your funds securely and efficiently."
+    }
   ];
 
+
   const faqs = [
-    { question: "How do I create an account on FinFlow?", answer: "Just click the 'Create Account' button and fill out a few simple details." },
-    { question: "Is my data safe with FinFlow?", answer: "Totally encrypted & locked tight." },
-    { question: "Do I need employee verification for transactions?", answer: "Not for regular payments. Employee verification is for account approvals & support only." },
-    { question: "Is FinFlow free to use?", answer: "Totally! No hidden fees, no tricks — just pure banking bliss 😌." },
+    {
+      question: "How do I create an account on FinFlow?",
+      answer: "Click the 'Create Account' button and follow the guided steps to sign up."
+    },
+    {
+      question: "Is my data safe with FinFlow?",
+      answer: "Yes. All user data is encrypted and stored securely in compliance with industry standards."
+    },
+    {
+      question: "Do I need identity verification for transactions?",
+      answer: "Basic transactions do not require verification. However, identity verification is necessary for account approval and customer support."
+    },
+    {
+      question: "Is FinFlow free to use?",
+      answer: "Absolutely. FinFlow is free to use with no hidden fees or surprise charges."
+    }
   ];
+
 
   const sectionStyle = "min-h-screen w-full snap-start flex items-center justify-center px-4";
 
   return (
     <motion.div
-      className="flex flex-col w-screen overflow-y-auto overflow-x-hidden snap-y snap-mandatory scroll-smooth"
+      className="h-screen flex flex-col w-screen overflow-y-auto overflow-x-hidden snap-y snap-mandatory scroll-smooth"
       style={{ backgroundColor: colors.background, color: colors.text }}
     >
       {/* Hero Section */}
-      <section className="min-h-screen w-full snap-start flex items-center justify-center relative" style={{ background: colors.gradient }}>
+      <section className="min-h-screen w-full snap-center snap-mandatory flex items-center justify-center relative" style={{ background: colors.gradient }}>
         <div className="absolute inset-0 bg-black/20 backdrop-blur-sm z-0" />
         <div className="z-10 text-center max-w-3xl px-4">
           <motion.h1 className="text-5xl font-bold text-white" initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
@@ -79,17 +126,17 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className={`${sectionStyle} snap-always`}>
+      <section className={`${sectionStyle} snap-center snap-mandatory`}>
         <div className="max-w-6xl w-full">
           <h2 className="text-4xl font-bold text-center mb-10">Why Choose <span style={{ color: colors.primary }}>FinFlow</span>?</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
             {features.map((item, index) => (
               <motion.div
                 key={index}
-                className="p-6 rounded-lg text-center shadow-md hover:shadow-lg transition-all duration-300"
+                className="p-6 rounded-lg text-center hover:shadow-md hover:shadow-blue-500/50 transition-all duration-300"
                 style={{ backgroundColor: colors.card }}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
@@ -103,17 +150,17 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className={`${sectionStyle} snap-always`}>
+      <section className={`${sectionStyle} snap-center snap-mandatory`}>
         <div className="max-w-6xl w-full">
           <h2 className="text-4xl font-bold text-center mb-10">How <span style={{ color: colors.primary }}>FinFlow</span> Works</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-10">
             {steps.map((step, index) => (
               <motion.div
                 key={index}
-                className="text-center p-6 rounded-lg shadow-md hover:shadow-xl transition-all duration-300"
+                className="text-center p-6 rounded-lg hover:shadow-md hover:shadow-blue-500/50 transition-all duration-300 transition-all duration-300"
                 style={{ backgroundColor: colors.card }}
-                initial={{ opacity: 0, y: 50 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.2 }}
               >
@@ -127,21 +174,21 @@ export default function Home() {
       </section>
 
       {/* FAQ */}
-      <section className={`${sectionStyle} snap-always`}>
+      <section className={`${sectionStyle} snap-center snap-mandatory`}>
         <div className="max-w-3xl w-full">
           <h2 className="text-4xl font-bold text-center mb-6">
             Frequently Asked <span style={{ color: colors.primary }}>Questions</span>
           </h2>
           {faqs.map((faq, idx) => (
-            <div key={idx} className="mb-4 border rounded-md" style={{ borderColor: colors.primaryDark }}>
-              <button onClick={() => toggleFAQ(idx)} className="w-full flex justify-between items-center px-4 py-3">
+            <div key={idx} className="mb-4  px-4 py-2 border rounded-md flex flex-col overflow-hidden" style={{ borderColor: colors.primaryDark }}>
+              <button onClick={() => toggleFAQ(idx)} className="w-full flex justify-between items-center">
                 <span className="font-semibold">{faq.question}</span>
                 {openIndex === idx ? <FaChevronUp /> : <FaChevronDown />}
               </button>
               <AnimatePresence>
                 {openIndex === idx && (
                   <motion.div
-                    className="px-4 pb-4 text-sm"
+                    className="text-sm"
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
                     exit={{ opacity: 0, height: 0 }}
@@ -158,7 +205,7 @@ export default function Home() {
 
       {/* Footer */}
       <footer
-        className="w-full py-6 border-t text-center"
+        className="w-full py-6 border-t text-center snap-end"
         style={{
           backgroundColor: colors.background,
           color: colors.text,

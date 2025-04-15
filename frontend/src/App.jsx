@@ -13,8 +13,8 @@ export default function App() {
     <ThemeProvider>
       <Router>
         <Routes>
-          <Route path="/home" element={<Home />} />
-          <Route path="/" element={<User/>}/>
+          <Route path="/" element={<Home />} />
+          <Route path="/user" element={<User/>}/>
           <Route path="/employee" element={<Employee/>}/>
           <Route path="/login" element={<Login/>}/>
           <Route path="/register" element={<Signup/>}/>

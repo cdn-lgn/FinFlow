@@ -1,17 +1,8 @@
 import React, { useState, useEffect } from "react";
 import FaceDetector from "./components/FaceDetector";
-
-const colors = {
-  primary: "#007BFF",
-  primaryDark: "#0056b3",
-  success: "#28A745",
-  warning: "#FFC107",
-  danger: "#DC3545",
-  background: "#F8F9FA",
-  card: "#FFFFFF",
-  text: "#212529",
-  gradient: "linear-gradient(90deg, #007BFF 0%, #3399FF 100%)",
-};
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { motion } from "framer-motion";
+import axiosClient from "../utils/axiosClient";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -26,9 +17,8 @@ const Signup = () => {
     addressLine: "",
     city: "",
     pincode: "",
-    longitude: "",
-    latitude: "",
-    country: "India", // Default to India
+    createdLocation: {},
+    country: "India",
   });
 
   const [userFace, setUserFace] = useState(null);
@@ -38,109 +28,102 @@ const Signup = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isImageCaptured, setIsImageCaptured] = useState(true);
   const [dobError, setDobError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
-  // Handle input change
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setFormData((prev) => ({
+          ...prev,
+          createdLocation: {
+            latitude: pos.coords.latitude,
+            longitude: pos.coords.longitude,
+          },
+        }));
+      },
+      (err) => console.error("Location Error:", err)
+    );
+  }, []);
+
+  useEffect(() => {
+    if (
+      formData.password &&
+      formData.confirmPassword &&
+      formData.password !== formData.confirmPassword
+    ) {
+      setPasswordError("Passwords do not match");
+    } else {
+      setPasswordError("");
+    }
+  }, [formData.password, formData.confirmPassword]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-
-    if (name === "pincode" && value.length > 6) {
-      return; // Prevent entering more than 6 digits
+    if (name === "pincode") {
+      if (!/^\d{0,6}$/.test(value)) return;
     }
-
-    setFormData({ ...formData, [name]: value });
+    if (name === "mobile") {
+      if (!/^\d{0,10}$/.test(value)) return;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
-  // Handle mobile/email verification
+  const validateDOB = (dob) => {
+    if (!dob) return setDobError("DOB is required"), false;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    if (age < 18)
+      return setDobError("You must be at least 18 years old"), false;
+    setDobError("");
+    return true;
+  };
+
   const handleVerify = (field) => {
     if (field === "mobile") setMobileVerified(true);
     else if (field === "email") setEmailVerified(true);
   };
 
-  // Auto fetch location
-  useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        setFormData((prev) => ({
-          ...prev,
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        }));
-      },
-      (err) => {
-        console.error("Location Error:", err);
+  const handleSubmit = async () => {
+    if (!validateDOB(formData.dob)) return;
+
+    const form = new FormData();
+
+    for (const key in formData) {
+      if (typeof formData[key] === 'object') {
+        form.append(key, JSON.stringify(formData[key]));
+      } else {
+        form.append(key, formData[key]);
       }
-    );
-  }, []);
-
-  //DOB Validation
-  const validateDOB = (dob) => {
-    if (!dob) {
-      setDobError("Date of Birth is required");
-      return false;
+    }
+    if (userFace) {
+      form.append("image", userFace);
     }
 
-    const birthDate = new Date(dob);
-    const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
+    try {
+      const response = await axiosClient.post("/api/v1/user/registration", form);
 
-    if (age < 18) {
-      setDobError("You must be at least 18 years old");
-      return false;
+      form.forEach((value, key) => {
+        console.log(`${key}:`, value);
+      });
+
+      console.log("✅ Server Response:", response.data);
+    } catch (error) {
+      console.error("❌ Upload Error:", error);
     }
-
-    setDobError("");
-    return true;
   };
 
-  const handleSubmit = () => {
-    if (!validateDOB(formData.dob)) {
-      return;
-    }
-
-    const finalData = {
-      fullName: formData.name,
-      fatherName: formData.fatherName,
-      dob: formData.dob,
-      phoneNumber: formData.mobile,
-      email: formData.email,
-      pan: formData.pan,
-      password: formData.password,
-      photoUrl: userFace,
-      address: {
-        addressLine: formData.addressLine,
-        city: formData.city,
-        pincode: formData.pincode,
-        country: formData.country,
-      },
-      createdLocation: {
-        longitude: parseFloat(formData.longitude),
-        latitude: parseFloat(formData.latitude),
-      },
-    };
-    console.log("User Submitted Data 👉", finalData);
-    alert("Account Created Successfully!");
-  };
-
-  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
-  const handleClickShowConfirmPassword = () =>
-    setShowConfirmPassword((prev) => !prev);
 
   const isFormValid =
-    formData.name &&
-    formData.fatherName &&
-    formData.dob &&
-    formData.mobile &&
-    formData.email &&
-    formData.pan &&
-    formData.password &&
-    formData.confirmPassword &&
-    formData.addressLine &&
-    formData.city &&
-    formData.pincode &&
+    Object.values(formData).every((val) => val !== "") &&
     userFace &&
     mobileVerified &&
     emailVerified &&
-    !dobError;
+    !dobError &&
+    !passwordError;
 
   if (!isImageCaptured) {
     return (
@@ -153,284 +136,219 @@ const Signup = () => {
   }
 
   return (
-    <Box
-      sx={{
-        width: "100vw",
-        minHeight: "100dvh",
-        bgcolor: colors.background,
-        color: colors.text,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center", // Center horizontally
-        paddingY: 4,
-        paddingX: 4,
-      }}
-    >
-      <Typography align="center" variant="h4">
-        <b style={{ color: colors.primaryDark }}>FinFlow </b>Registration
-      </Typography>
-      <Box
-        sx={{
-          width: "100%",
-          maxWidth: 800, // Added maximum width for better readability
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          paddingY: 3,
-        }}
+    <div className="min-h-screen w-full bg-gray-100 text-gray-800 p-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-xl"
       >
-        <Divider
-          variant="middle"
-          orientation="horizontal"
-          sx={{ width: "90%", bgcolor: colors.text }}
-        ></Divider>
-      </Box>
+        <h2 className="text-3xl font-bold text-center mb-8 text-blue-700">
+          FinFlow Registration
+        </h2>
 
-      <Grid container spacing={4} maxWidth={800}>
-        {/* Left */}
-        <Grid item xs={12} md={6}>
-          <Typography variant="h6">Personal Info</Typography>
-          <TextField
-            fullWidth
-            required
-            name="name"
-            label="Full Name"
-            size="small"
-            value={formData.name}
-            onChange={handleChange}
-            sx={{ mt: 2, bgcolor: colors.card, input: { color: colors.text } }}
-          />
-          <TextField
-            fullWidth
-            name="fatherName"
-            label="Father's Name"
-            size="small"
-            value={formData.fatherName}
-            onChange={handleChange}
-            sx={{ mt: 2, bgcolor: colors.card, input: { color: colors.text } }}
-          />
-          <TextField
-            fullWidth
-            name="dob"
-            label="Date of Birth"
-            type="date"
-            size="small"
-            value={formData.dob}
-            onChange={handleChange}
-            error={!!dobError}
-            helperText={dobError}
-            sx={{
-              mt: 2,
-              bgcolor: colors.card,
-              input: { color: colors.text },
-              "& .MuiInputLabel-root": { top: "-8px" },
-            }}
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            fullWidth
-            name="pan"
-            label="PAN Number"
-            size="small"
-            value={formData.pan}
-            onChange={handleChange}
-            sx={{ mt: 2, bgcolor: colors.card, input: { color: colors.text } }}
-          />
+        {/* Personal Info */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">Personal Info</h3>
+          <div className="grid md:grid-cols-1 gap-6">
+            <input
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              value={formData.name}
+              onChange={handleChange}
+              className="input"
+            />
+            <input
+              type="text"
+              name="fatherName"
+              placeholder="Father's Name"
+              value={formData.fatherName}
+              onChange={handleChange}
+              className="input"
+            />
+            <input
+              type="date"
+              name="dob"
+              value={formData.dob}
+              onChange={handleChange}
+              min="1945-04-15"
+              max="2007-04-15"
+              className={`input ${dobError ? "border-red-500 bg-red-50" : ""}`}
+            />
+            {dobError && <p className="text-sm text-red-500">{dobError}</p>}
+            <input
+              type="text"
+              name="pan"
+              placeholder="PAN Number"
+              value={formData.pan}
+              onChange={handleChange}
+              className="input input"
+            />
+          </div>
+        </div>
 
-          <Typography variant="h6" sx={{ mt: 4 }}>
-            Address Info
-          </Typography>
-          <TextField
-            fullWidth
-            name="addressLine"
-            label="Address Line"
-            size="small"
-            value={formData.addressLine}
-            onChange={handleChange}
-            sx={{ mt: 2, bgcolor: colors.card, input: { color: colors.text } }}
-          />
-          <TextField
-            fullWidth
-            name="city"
-            label="City"
-            size="small"
-            value={formData.city}
-            onChange={handleChange}
-            sx={{ mt: 2, bgcolor: colors.card, input: { color: colors.text } }}
-          />
-          <TextField
-            fullWidth
-            name="pincode"
-            label="Pincode"
-            size="small"
-            value={formData.pincode}
-            onChange={handleChange}
-            inputProps={{ maxLength: 6, inputMode: "numeric", pattern: "[0-9]*" }} // Limit to 6 digits and numeric input
-            sx={{ mt: 2, bgcolor: colors.card, input: { color: colors.text } }}
-          />
-        </Grid>
+        {/* Address Info */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">Address</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <input
+              type="text"
+              name="addressLine"
+              placeholder="Address Line"
+              value={formData.addressLine}
+              onChange={handleChange}
+              className="input"
+            />
+            <input
+              type="text"
+              name="city"
+              placeholder="City"
+              value={formData.city}
+              onChange={handleChange}
+              className="input"
+            />
+            <input
+              type="text"
+              name="pincode"
+              placeholder="Pincode"
+              value={formData.pincode}
+              onChange={handleChange}
+              className="input"
+            />
+            <input
+              name="country"
+              value="India"
+              disabled
+              className="input bg-gray-200 cursor-not-allowed"
+            />
+          </div>
+        </div>
 
-        {/* Right */}
-        <Grid item xs={12} md={6}>
-          <Typography variant="h6">Contact Info</Typography>
-          <Grid container spacing={2} mt={1}>
-            <Grid item xs={8}>
-              <TextField
-                fullWidth
+        {/* Contact Info */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">Contact Info</h3>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex gap-2">
+              <input
+                type="text"
                 name="mobile"
-                label="Mobile Number"
-                size="small"
+                placeholder="Mobile"
                 value={formData.mobile}
                 onChange={handleChange}
-                sx={{ bgcolor: colors.card, input: { color: colors.text } }}
+                className="input"
               />
-            </Grid>
-            <Grid item xs={4}>
-              <Button
-                fullWidth
-                size="small"
-                variant="contained"
+              <button
                 onClick={() => handleVerify("mobile")}
-                sx={{
-                  bgcolor: mobileVerified ? colors.success : colors.primary,
-                }}
+                className={`btn text-white ${
+                  mobileVerified ? "bg-green-500" : "bg-blue-500"
+                }`}
               >
                 {mobileVerified ? "Verified" : "Verify"}
-              </Button>
-            </Grid>
-
-            <Grid item xs={8}>
-              <TextField
-                fullWidth
+              </button>
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="email"
                 name="email"
-                label="Email"
-                size="small"
+                placeholder="Email"
                 value={formData.email}
                 onChange={handleChange}
-                sx={{ bgcolor: colors.card, input: { color: colors.text } }}
+                className="input"
               />
-            </Grid>
-            <Grid item xs={4}>
-              <Button
-                fullWidth
-                size="small"
-                variant="contained"
+              <button
                 onClick={() => handleVerify("email")}
-                sx={{
-                  bgcolor: emailVerified ? colors.success : colors.primary,
-                }}
+                className={`text-white btn  ${
+                  emailVerified ? "bg-green-500" : "bg-blue-500"
+                }`}
               >
                 {emailVerified ? "Verified" : "Verify"}
-              </Button>
-            </Grid>
-          </Grid>
+              </button>
+            </div>
+          </div>
+        </div>
 
-          <Typography variant="h6" mt={4}>
-            Set Password
-          </Typography>
-          <Grid container spacing={2} mt={1}>
-            <Grid item xs={6}>
-              <OutlinedInput
-                fullWidth
+        {/* Password Section */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">Create Password</h3>
+          <div className="grid md:grid-cols-2 gap-4 relative">
+            <div className="relative w-full">
+              <input
+                type={showPassword ? "text" : "password"}
                 name="password"
                 placeholder="Password"
-                size="small"
-                type={showPassword ? "text" : "password"}
                 value={formData.password}
                 onChange={handleChange}
-                sx={{ bgcolor: colors.card, color: colors.text }}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton onClick={handleClickShowPassword}>
-                      {showPassword ? <VisibilityOff /> : <Visibility />}
-                    </IconButton>
-                  </InputAdornment>
-                }
+                className="input pr-12"
               />
-            </Grid>
-            <Grid item xs={6}>
-              <OutlinedInput
-                fullWidth
+              <div
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <FaEyeSlash /> : <FaEye />}
+              </div>
+            </div>
+            <div className="relative w-full">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
                 name="confirmPassword"
                 placeholder="Confirm Password"
-                size="small"
-                type={showConfirmPassword ? "text" : "password"}
                 value={formData.confirmPassword}
                 onChange={handleChange}
-                sx={{ bgcolor: colors.card, color: colors.text }}
-                endAdornment={
-                  <InputAdornment position="end">
-                    <IconButton onClick={handleClickShowConfirmPassword}>
-                      {showConfirmPassword ? (
-                        <VisibilityOff />
-                      ) : (
-                        <Visibility />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                }
+                className="input pr-12"
               />
-            </Grid>
-          </Grid>
-
-          <Box mt={4}>
-            <Typography variant="h6" mb={1}>
-              Face Verification
-            </Typography>
-            <Box display="flex" alignItems="center" gap={2}>
-              <Box
-                component="img"
-                sx={{
-                  height: 150,
-                  width: 150,
-                  borderRadius: 5,
-                  backgroundColor: "black",
-                }}
-                src={userFace}
-              />
-              <Button
-                variant="outlined"
-                onClick={() => setIsImageCaptured(false)}
-                sx={{
-                  px: 4,
-                  py: 1,
-                  fontWeight: 600,
-                  borderColor: userFace ? "green" : colors.primary,
-                  color: userFace ? "green" : colors.primary,
-                  "&:hover": {
-                    backgroundColor: userFace ? "green" : colors.primary,
-                    color: "#fff",
-                  },
-                }}
+              <div
+                className="absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
               >
-                Verify Face
-              </Button>
-            </Box>
-          </Box>
-        </Grid>
+                {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+              </div>
+            </div>
+          </div>
+          {passwordError && (
+            <p className="text-sm text-red-500 mt-1">{passwordError}</p>
+          )}
+        </div>
 
-        {/* Submit */}
-        <Grid item xs={12}>
-          <Box textAlign="center" mt={4}>
-            <Button
-              variant="contained"
-              size="large"
-              onClick={handleSubmit}
-              disabled={!isFormValid}
-              sx={{
-                backgroundColor: colors.primary,
-                px: 6,
-                py: 1.5,
-                fontSize: "16px",
-                fontWeight: "bold",
-              }}
+        {/* Face Verification */}
+        <div className="mb-8">
+          <h3 className="text-xl font-semibold mb-4">Face Verification</h3>
+          <div className="flex items-center gap-4">
+            <div className="w-32 h-32 bg-black rounded-lg overflow-hidden">
+              {userFace && (
+                <img
+                  src={URL.createObjectURL(userFace)}
+                  alt="face"
+                  className="w-full h-full object-cover"
+                />
+              )}
+            </div>
+            <button
+              onClick={() => setIsImageCaptured(false)}
+              className={`btn text-white ${
+                userFace ? "bg-green-500" : "bg-blue-500"
+              }`}
             >
-              Create Account
-            </Button>
-          </Box>
-        </Grid>
-      </Grid>
-    </Box>
+              {userFace ? "Retake Face" : "Verify Face"}
+            </button>
+          </div>
+        </div>
+
+        {/* Submit Button */}
+        <div className="mt-10 text-center">
+          <button
+            onClick={handleSubmit}
+            disabled={!isFormValid}
+            className={`btn  ${
+              !isFormValid
+                ? "opacity-50 cursor-not-allowed text-black"
+                : "bg-blue-500 text-white"
+            }`}
+          >
+            Create Account
+          </button>
+        </div>
+      </motion.div>
+    </div>
   );
 };
 

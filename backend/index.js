@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
+import userRouter from "./routes/user.routes.js";
 
 dotenv.config();
 
@@ -24,6 +25,9 @@ if (environment == "development") {
     next();
   });
 }
+
+const API_PREFIX = '/api/v1'
+app.use(`${API_PREFIX}/user`, userRouter);
 
 app.get("/", (req, res) => {
   res.send("Welcome to FinFlow Backend Server");
