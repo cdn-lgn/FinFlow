@@ -8,7 +8,7 @@ TextLink.useKey(process.env.TELELINK_API_KEY||"5pyin3cuGDcKDuLJ9CemVhh2aP8N61p50
 async function sendSMS(to, message) {
   try {
     const response = await TextLink.sendSMS(to, message);
-    console.log("📩 SMS Response:", response);
+    console.log("📩 SMS Response:", response)
   } catch (error) {
     console.error("❌ SMS Error:", error);
   }

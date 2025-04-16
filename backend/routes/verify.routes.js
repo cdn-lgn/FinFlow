@@ -1,8 +1,9 @@
 import { Router } from "express";
-import { userRegistration } from "../controllers/user.controllers.js";
-import upload from "../config/multer.js";
+import { otpVerificationAtRegisteration, sendOtpForVerification } from "../controllers/verify.controllers.js";
 
-const userRouter = Router();
-userRouter.post("/registration", upload.single("image"), userRegistration);
+const otpVerifyRouter = Router();
+otpVerifyRouter.post("/send-otp", sendOtpForVerification);
+otpVerifyRouter.post("/verify-otp", otpVerificationAtRegisteration);
 
-export default userRouter;
+
+export default otpVerifyRouter;

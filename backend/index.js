@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import connectDB from "./config/db.js";
 import userRouter from "./routes/user.routes.js";
+import otpVerifyRouter from "./routes/verify.routes.js";
 
 dotenv.config();
 
@@ -28,6 +29,8 @@ if (environment == "development") {
 
 const API_PREFIX = "/api/v1";
 app.use(`${API_PREFIX}/user`, userRouter);
+app.use(`${API_PREFIX}/verify`, otpVerifyRouter);
+
 
 app.get("/", (req, res) => {
   res.send("Welcome to FinFlow Backend Server");

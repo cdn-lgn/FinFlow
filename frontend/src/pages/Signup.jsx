@@ -23,11 +23,10 @@ const Signup = () => {
   });
 
   const [userFace, setUserFace] = useState(null);
-  const [mobileVerified, setMobileVerified] = useState(false);
-  const [emailVerified, setEmailVerified] = useState(false);
+  const [mobileAndEmailVerified, setMobileAndEmailVerified] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
-  const [otpTarget, setOtpTarget] = useState("");
+  const [otpTarget, setOtpTarget] = useState({});
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isImageCaptured, setIsImageCaptured] = useState(true);
   const [dobError, setDobError] = useState("");
@@ -87,14 +86,13 @@ const Signup = () => {
 
   const handleVerify = (field) => {
     if (field != "") setShowOtpModal(true);
-    setOtpTarget(Number(field) ? Number(field):field)
+    setOtpTarget(field)
   };
   if (showOtpModal && otpTarget) {
     return (
       <OtpVerify
         sendTo={otpTarget}
-        setMobileVerified={setMobileVerified}
-        setEmailVerified={setEmailVerified}
+        setMobileAndEmailVerified={setMobileAndEmailVerified}
         onClose={() => setShowOtpModal(false)}
       />
     );
@@ -119,7 +117,7 @@ const Signup = () => {
 
     try {
       const response = await axiosClient.post(
-        "/api/v1/user/registration",
+        "/user/registration",
         form
       );
       console.log("✅ Server Response:", response.data);
@@ -131,8 +129,7 @@ const Signup = () => {
   const isFormValid =
     Object.values(formData).every((val) => val !== "") &&
     userFace &&
-    mobileVerified &&
-    emailVerified &&
+    mobileAndEmailVerified &&
     !dobError &&
     !passwordError;
 
@@ -248,14 +245,6 @@ const Signup = () => {
                 onChange={handleChange}
                 className="input"
               />
-              <button
-                onClick={() => handleVerify(formData.mobile)}
-                className={`btn text-white ${
-                  mobileVerified ? "bg-green-500" : "bg-blue-500"
-                }`}
-              >
-                {mobileVerified ? "Verified" : "Verify"}
-              </button>
             </div>
             <div className="flex gap-2">
               <input
@@ -267,12 +256,13 @@ const Signup = () => {
                 className="input"
               />
               <button
-                onClick={() => handleVerify(formData.email)}
+                onClick={() => handleVerify({email:formData.email,mobile:formData.mobile})}
+                disabled={!formData.email || !formData.mobile}
                 className={`text-white btn  ${
-                  emailVerified ? "bg-green-500" : "bg-blue-500"
-                }`}
+                  mobileAndEmailVerified ? "bg-green-500" : "bg-blue-500"
+                } ${!formData.email || !formData.mobile ? "opacity-50 cursor-not-allowed" : ""}`}
               >
-                {emailVerified ? "Verified" : "Verify"}
+                {mobileAndEmailVerified ? "Verified" : "Verify"}
               </button>
             </div>
           </div>
