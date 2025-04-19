@@ -9,12 +9,12 @@ const addressSchema = new mongoose.Schema({
     match: [/^\d{6}$/, "Invalid pincode"],
   },
   country: { type: String, required: [true, "Country is required"] },
-});
+},{_id: false});
 
 const locationSchema = new mongoose.Schema({
   longitude: { type: Number },
   latitude: { type: Number },
-});
+},{ _id: false });
 
 const userSchema = new mongoose.Schema(
   {
@@ -45,6 +45,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password must be required"],
       minLength: [8, "Password must be at least 8 characters."],
+      select:false,
     },
     dob: { type: Date, required: [true, "Date of birth is required."] },
     pan: {
@@ -63,11 +64,13 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
     isVerified: { type: Boolean, default: false },
-    isEmailVerified: { type: Boolean, default: false },
-    isPhoneVerified: { type: Boolean, default: false },
+    isEmailAndMobileVerified: { type: Boolean, default: false },
     address: addressSchema,
-    createdLocation: locationSchema,
-    lastLoginLocation: locationSchema,
+    createdLocation: {
+      type: locationSchema,
+      select: false,
+    },
+    lastLoginLocation: {type:locationSchema,select:false},
     otp: {
       code: { type: String },
       expiresAt: { type: Date },

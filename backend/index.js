@@ -4,10 +4,11 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import userRouter from "./routes/user.routes.js";
 import otpVerifyRouter from "./routes/verify.routes.js";
+import cookieParser from "cookie-parser";
 
 dotenv.config();
 
-const environment = process.env.NODE_ENV || "production";
+const environment = process.env.NODE_ENV || "development";
 
 connectDB();
 const app = express();
@@ -19,6 +20,9 @@ app.use(
 );
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
+
+
 if (environment == "development") {
   app.use((req, res, next) => {
     console.log("✅ Req from frontend for route : ", req.url);

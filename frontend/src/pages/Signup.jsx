@@ -85,9 +85,9 @@ const Signup = () => {
   };
 
   const handleVerify = (field) => {
-    if(mobileAndEmailVerified) return;
+    if (mobileAndEmailVerified) return;
     if (field != "") setShowOtpModal(true);
-    setOtpTarget(field)
+    setOtpTarget(field);
   };
   if (showOtpModal && otpTarget) {
     return (
@@ -98,7 +98,6 @@ const Signup = () => {
       />
     );
   }
-
 
   const handleSubmit = async () => {
     if (!validateDOB(formData.dob)) return;
@@ -115,12 +114,12 @@ const Signup = () => {
     if (userFace) {
       form.append("image", userFace);
     }
+    if(mobileAndEmailVerified) {
+      form.append("isEmailAndMobileVerified", "true");
+    }
 
     try {
-      const response = await axiosClient.post(
-        "/user/registration",
-        form
-      );
+      const response = await axiosClient.post("/user/registration", form);
       console.log("✅ Server Response:", response.data);
     } catch (error) {
       console.error("❌ Upload Error:", error);
@@ -257,11 +256,22 @@ const Signup = () => {
                 className="input"
               />
               <button
-                onClick={() => handleVerify({email:formData.email,mobile:formData.mobile})}
+                onClick={() =>
+                  handleVerify({
+                    email: formData.email,
+                    mobile: formData.mobile,
+                  })
+                }
                 disabled={!formData.email || !formData.mobile}
                 className={`text-white btn  ${
-                  mobileAndEmailVerified ? "bg-green-500 opacity-50 cursor-not-allowed" : "bg-blue-500"
-                } ${!formData.email || !formData.mobile ? "opacity-50 cursor-not-allowed" : ""}`}
+                  mobileAndEmailVerified
+                    ? "bg-green-500 opacity-50 cursor-not-allowed"
+                    : "bg-blue-500"
+                } ${
+                  !formData.email || !formData.mobile
+                    ? "opacity-50 cursor-not-allowed"
+                    : ""
+                }`}
               >
                 {mobileAndEmailVerified ? "Verified" : "Verify"}
               </button>
