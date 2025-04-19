@@ -1,10 +1,16 @@
 import React, { useContext, useState } from 'react';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import { ThemeContext } from '../context/ThemeContext';
-import axios from 'axios';
 import axiosClient from '../utils/axiosClient';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUser } from '../redux/userSlice';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+
   const { colors } = useContext(ThemeContext);
   const [showPassword, setShowPassword] = useState(false);
   const [role, setRole] = useState('user');
@@ -23,6 +29,10 @@ const Login = () => {
         { email, password, role }
       );
       console.log('✅ Logged in:', res.data);
+      if(res.data?.userData?.fullName) {
+        dispatch(setUser(res.data.userData));
+        navigate(`/${role}`);
+      }
     } catch (err) {
       console.error('❌ Login error:', err);
       setError(err.response?.data?.message || 'Login failed. Please try again.');

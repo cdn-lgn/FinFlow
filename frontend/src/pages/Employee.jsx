@@ -2,7 +2,6 @@ import React, { useContext } from 'react';
 import Sidebar from './components/Sidebar';
 import { ThemeContext } from '../context/ThemeContext';
 
-// Import employee-specific components
 import EmployeeDashboard from './components/employee/EmployeeDashboard.jsx';
 import VerifyUsers from './components/employee/VerifyUsers';
 import UserList from './components/employee/UserList';
@@ -11,10 +10,20 @@ const Employee = () => {
   const { colors, selectedOption } = useContext(ThemeContext);
 
   return (
-    <div className={`bg-${colors.background} text-${colors.text} flex h-screen w-full overflow-hidden`}>
-      <Sidebar role="employee" />
+    <div
+      className="flex h-screen w-full"
+      style={{
+        backgroundColor: colors.background,
+        color: colors.text,
+      }}
+    >
+      {/* Sidebar */}
+      <div className="w-64 fixed top-0 left-0 bottom-0 z-10">
+        <Sidebar role="employee" />23
+      </div>
 
-      <div className="flex-1 p-4">
+      {/* Main Content */}
+      <div className="ml-64 w-full overflow-y-auto">
         {selectedOption === 0 && <EmployeeDashboard />}
         {selectedOption === 1 && <VerifyUsers />}
         {selectedOption === 2 && <UserList />}

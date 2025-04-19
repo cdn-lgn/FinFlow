@@ -7,6 +7,8 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import NotFound from "./pages/NotFound";
 import Employee from "./pages/Employee";
+import PublicRoute from "./pages/components/PublicRoute";
+import PrivateRoute from "./pages/components/PrivateRoute";
 
 export default function App() {
   return (
@@ -14,11 +16,39 @@ export default function App() {
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/user" element={<User/>}/>
-          <Route path="/employee" element={<Employee/>}/>
-          <Route path="/login" element={<Login/>}/>
-          <Route path="/register" element={<Signup/>}/>
-          <Route path="*" element={<NotFound/>}/>
+          <Route
+            path="/user"
+            element={
+              <PrivateRoute>
+                <User />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/employee"
+            element={
+              <PrivateRoute>
+                <Employee />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/login"
+            element={
+              // <PublicRoute>
+                <Login />
+              // </PublicRoute>
+            }
+          />
+          <Route
+            path="/register"
+            element={
+              <PublicRoute>
+                <Signup />
+              </PublicRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </ThemeProvider>
