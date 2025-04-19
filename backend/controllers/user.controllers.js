@@ -24,6 +24,8 @@ export async function userRegistration(req, res) {
       createdLocation,
     } = req.body;
 
+    const isUserDataAvailable = await
+
     if (!req.file) throw new Error("Profile photo is required.");
     if (password !== confirmPassword)
       throw new Error("Password and Confirm Password do not match.");

@@ -43,9 +43,9 @@ export default function App() {
           <Route
             path="/register"
             element={
-              <PublicRoute>
+              // <PublicRoute>
                 <Signup />
-              </PublicRoute>
+              // </PublicRoute>
             }
           />
           <Route path="*" element={<NotFound />} />

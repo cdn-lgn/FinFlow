@@ -122,7 +122,7 @@ const Login = () => {
         {/* Footer Actions */}
         <div className={`mt-4 flex justify-between text-sm text-${colors.text}`}>
           <span className="cursor-pointer">Forgot Password?</span>
-          <span className="cursor-pointer">Create Account</span>
+          <span className="cursor-pointer" onClick={()=>navigate("/register")}>Create Account</span>
         </div>
       </div>
     </div>
