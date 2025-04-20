@@ -3,6 +3,8 @@ import { User } from "../models/user.models.js";
 import { comparePassword, hashedPassword } from "../utils/bcrypt.js";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { PanCard } from "../models/pan_card.models.js";
+import { Account } from "../models/account.models.js";
 dotenv.config();
 
 export async function userRegistration(req, res) {
@@ -24,20 +26,22 @@ export async function userRegistration(req, res) {
       createdLocation,
     } = req.body;
 
-    const isUserDataAvailable = await
-
+    // Validate required fields
     if (!req.file) throw new Error("Profile photo is required.");
     if (password !== confirmPassword)
-      throw new Error("Password and Confirm Password do not match.");
+      throw new Error("Passwords do not match.");
 
+    // Hash password
     const hsPassword = await hashedPassword(password);
 
+    // Upload profile photo
     const uploadPhoto = await imageKit.upload({
       file: req.file.buffer,
       fileName: `${Date.now()}_${fullName}`,
       folder: "finflow/userProfile",
     });
 
+    // Create user object
     const userData = {
       fullName: fullName.toLowerCase(),
       fatherName: fatherName.toLowerCase(),
@@ -55,14 +59,60 @@ export async function userRegistration(req, res) {
       },
       createdLocation: JSON.parse(createdLocation),
       photoUrl: uploadPhoto.url,
+
     };
 
     const user = await User.create(userData);
     console.log("✨ User Created:", user);
 
+    const panMatch = await PanCard.findOne({ pan_card_id: pan });
+
+    if (panMatch) {
+      const toIsoDate = (dateStr) => {
+        if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
+          const [dd, mm, yyyy] = dateStr.split("-");
+          return `${yyyy}-${mm}-${dd}`;
+        }
+        return dateStr;
+      };
+
+
+      const matches = {
+        name: panMatch.full_name?.toLowerCase() === fullName.toLowerCase(),
+        dob:dob===toIsoDate(panMatch.dob),
+        pan: panMatch.pan_card_id === pan,
+        fatherName:
+          panMatch.fathers_name?.toLowerCase() === fatherName.toLowerCase(),
+      };
+
+      const allMatch = Object.values(matches).every(Boolean);
+      console.log(Object.values(matches))
+
+      if (allMatch) {
+        const userBankAccount = {
+          user: user._id,
+          accountNumber: `${Math.floor(
+            1000000000 + Math.random() * 9000000000
+          )}`,
+          openedAt: new Date(),
+          location: user.createdLocation,
+        };
+
+        await Account.create(userBankAccount);
+        console.log("✨ User Bank Account Created:", userBankAccount);
+
+        return res.status(200).json({
+          success: true,
+          message: "✅ User and Bank Account Created",
+          account: true,
+        });
+      }
+    }
+
     res.status(200).json({
       success: true,
-      message: "✅ User Registration Successful",
+      message: "✅ User Registered (No matching PAN card found)",
+      account: false,
     });
   } catch (error) {
     console.error("❌ Registration Error:", error);

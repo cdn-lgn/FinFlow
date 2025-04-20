@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const locationSchema = new mongoose.Schema({
   latitude: Number,
   longitude: Number,
-});
+},{_id: false});
 
 const accountSchema = new mongoose.Schema(
   {
