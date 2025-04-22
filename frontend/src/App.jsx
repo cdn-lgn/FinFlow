@@ -9,6 +9,7 @@ import NotFound from "./pages/NotFound";
 import Employee from "./pages/Employee";
 import PublicRoute from "./pages/components/PublicRoute";
 import PrivateRoute from "./pages/components/PrivateRoute";
+import VerificationResult from "./pages/VerificationResult";
 
 export default function App() {
   return (
@@ -48,6 +49,7 @@ export default function App() {
               // </PublicRoute>
             }
           />
+          <Route path="/verify" element={<VerificationResult/>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>

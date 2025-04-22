@@ -4,6 +4,7 @@ import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { motion } from "framer-motion";
 import axiosClient from "../utils/axiosClient";
 import OtpVerify from "./components/OtpVerify";
+import { useNavigate } from "react-router-dom";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -21,7 +22,7 @@ const Signup = () => {
     createdLocation: {},
     country: "India",
   });
-
+const navigate = useNavigate();
   const [userFace, setUserFace] = useState(null);
   const [mobileAndEmailVerified, setMobileAndEmailVerified] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -120,7 +121,7 @@ const Signup = () => {
 
     try {
       const response = await axiosClient.post("/user/registration", form);
-      console.log("✅ Server Response:", response.data);
+      if(response?.data?.success) navigate("/verify", { state: { result: response.data } });
     } catch (error) {
       console.error("❌ Upload Error:", error);
     }
