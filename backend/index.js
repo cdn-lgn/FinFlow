@@ -33,6 +33,7 @@ if (environment == "development") {
 
 const API_PREFIX = "/api/v1";
 app.use(`${API_PREFIX}/user`, userRouter);
+app.use(`${API_PREFIX}/users`, userRouter);
 app.use(`${API_PREFIX}/verify`, otpVerifyRouter);
 
 

@@ -64,6 +64,17 @@ const userSchema = new mongoose.Schema(
       default: "user",
     },
     isVerified: { type: Boolean, default: false },
+    verifiedBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
+      default: null, // null if automated
+    },
+    verifiedByType: {
+      type: String,
+      enum: ['user', 'automated'],
+      default: 'automated',
+    },
+
     isEmailAndMobileVerified: { type: Boolean, default: false },
     address: addressSchema,
     createdLocation: {

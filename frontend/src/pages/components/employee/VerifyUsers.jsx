@@ -1,68 +1,113 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ThemeContext } from '../../../context/ThemeContext';
-import { FaUserCircle } from 'react-icons/fa';
-
-const dummyUsers = [
-  {
-    id: 1,
-    name: "Aarav Sharma",
-    email: "aarav@example.com",
-    photo: "https://randomuser.me/api/portraits/men/75.jpg",
-    status: "pending",
-  },
-  {
-    id: 2,
-    name: "Neha Kapoor",
-    email: "neha@example.com",
-    photo: "https://randomuser.me/api/portraits/women/65.jpg",
-    status: "pending",
-  },
-];
+import axiosClient from '../../../utils/axiosClient';
+import ShowUserDetails from './ShowUserDetails';
 
 const VerifyUsers = () => {
   const { colors } = useContext(ThemeContext);
-  const [users, setUsers] = useState(dummyUsers);
+  const [usersForVerification, setUsersForVerification] = useState([]);
+  const [userPopup,setUserPopup] = useState(false)
+  const [selectedUser,setSelectedUser] = useState()
 
-  const handleVerify = (id) => {
-    const updated = users.map((user) =>
-      user.id === id ? { ...user, status: 'verified' } : user
-    );
-    setUsers(updated);
+  const handleVerify = async (user) => {
+    try {
+      const response = await axiosClient.put("/user/verify",{email:user.email});
+      console.log(response);
+      if (response.status === 200 && response.data.isVerified) {
+        setUsersForVerification((prevUsers) =>
+          prevUsers.filter((u) => u.email !== response.data.email)
+        );
+        console.log('User verified and removed from pending list:', response.data);
+      }
+
+    } catch (error) {
+
+    }
   };
+
+  const handleView = (user) => {
+    console.log('View details for user:', user);
+    setUserPopup(true)
+    setSelectedUser(user)
+  };
+
+  useEffect(() => {
+    const fetchUsersForVerification = async () => {
+      try {
+        const response = await axiosClient.get('/users/verification');
+        setUsersForVerification(response.data.users);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+
+    fetchUsersForVerification();
+  }, []);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="flex-grow p-4 w-full overflow-y-auto"
+      className="flex-grow p-6 w-full overflow-y-auto"
     >
-      <h2 className="text-3xl font-semibold mb-4 text-gray-800">Verify Users ✅</h2>
+      <h2 className="text-3xl font-semibold mb-6 text-white">Verify Users</h2>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {users.map((user) => (
-          <div key={user.id} className="p-4 bg-white rounded-lg shadow-md hover:scale-102">
-            <div className="flex items-center gap-4">
+      <div className="space-y-4">
+        {userPopup && <ShowUserDetails setUserPopup={setUserPopup} selectedUser={selectedUser} setSelectedUser={setSelectedUser} />}
+        {usersForVerification?.map((user) => (
+          <div
+            key={user.phoneNumber}
+            className="p-5 rounded-lg shadow-md flex flex-col md:flex-row items-center md:items-start justify-between gap-4"
+            style={{ backgroundColor: colors.card }}
+          >
+            <div className="flex items-center gap-4 w-full md:w-2/3">
               <img
-                src={user.photo}
-                alt={user.name}
-                className="w-14 h-14 rounded-full object-cover"
+                src={user.photoUrl || 'https://via.placeholder.com/150'}
+                alt={user.fullName}
+                className="w-16 h-16 rounded-full object-cover border-2"
               />
-              <div className="flex-grow">
-                <h3 className="text-xl font-semibold text-gray-800">{user.name}</h3>
-                <p className="text-sm text-gray-500">{user.email}</p>
+              <div>
+                <h3 className="text-xl font-semibold" style={{ color: colors.text }}>
+                  {user.fullName}
+                </h3>
+                <p className="text-sm" style={{ color: colors.text }}>
+                  <span className="font-medium text-gray-400">Email:</span> {user.email}
+                </p>
+                <p className="text-sm" style={{ color: colors.text }}>
+                  <span className="font-medium text-gray-400">Phone:</span> {user.phoneNumber}
+                </p>
               </div>
-              {user.status === 'pending' ? (
+            </div>
+
+            <div className="flex gap-3 w-full md:w-auto justify-end">
+              <button
+                onClick={() => handleView(user)}
+                className="px-4 py-2 rounded-lg font-medium"
+                style={{
+                  backgroundColor: colors.warning,
+                  color: '#fff',
+                }}
+              >
+                View
+              </button>
+
+              {!user.isVerified ? (
                 <button
-                  onClick={() => handleVerify(user.id)}
-                  className={`bg-${colors.primary} hover:bg-${colors.primaryDark} text-white px-4 py-2 rounded-lg`}
+                  onClick={() => handleVerify(user)}
+                  className="px-4 py-2 rounded-lg font-medium"
+                  style={{
+                    backgroundColor: colors.primary,
+                    color: '#fff',
+                  }}
                 >
                   Verify
                 </button>
               ) : (
                 <span
-                  className="text-green-500 font-semibold"
+                  className="px-4 py-2 rounded-lg font-semibold"
+                  style={{ color: colors.success }}
                 >
                   Verified
                 </span>

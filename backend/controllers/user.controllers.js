@@ -59,7 +59,6 @@ export async function userRegistration(req, res) {
       },
       createdLocation: JSON.parse(createdLocation),
       photoUrl: uploadPhoto.url,
-
     };
 
     const user = await User.create(userData);
@@ -76,17 +75,16 @@ export async function userRegistration(req, res) {
         return dateStr;
       };
 
-
       const matches = {
         name: panMatch.full_name?.toLowerCase() === fullName.toLowerCase(),
-        dob:dob===toIsoDate(panMatch.dob),
+        dob: dob === toIsoDate(panMatch.dob),
         pan: panMatch.pan_card_id === pan,
         fatherName:
           panMatch.fathers_name?.toLowerCase() === fatherName.toLowerCase(),
       };
 
       const allMatch = Object.values(matches).every(Boolean);
-      console.log(Object.values(matches))
+      console.log(Object.values(matches));
 
       if (allMatch) {
         const userBankAccount = {
@@ -136,9 +134,13 @@ export async function userLogin(req, res) {
     const isPasswordMatched = await comparePassword(password, user.password);
     if (!isPasswordMatched) throw new Error("Invalid credentials.");
 
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
-      expiresIn: "1d",
-    });
+    const token = jwt.sign(
+      { userId: user._id, role: user.role },
+      process.env.JWT_SECRET_KEY,
+      {
+        expiresIn: "1d",
+      }
+    );
 
     const {
       password: _,
@@ -167,6 +169,60 @@ export async function userLogin(req, res) {
     res.status(400).json({
       success: false,
       message: error.message || "User login failed",
+    });
+  }
+}
+
+export async function fetchUsersForVerfication(req, res) {
+  try {
+    const users = await User.find({ isVerified: false, role: "user" }).select(
+      "-password -__v -_id -updatedAt "
+    );
+    if (!users) throw new Error("No users found for verification.");
+
+    res.status(200).json({
+      success: true,
+      message: "✅ Users fetched successfully",
+      users,
+    });
+  } catch (error) {
+    console.error("❌ Fetch Users Error:", error.message);
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to fetch users",
+    });
+  }
+}
+
+export async function userVerificationAndUpdate(req, res) {
+  try {
+    if (req.user.senderRole !== "admin" && req.user.senderRole !== "employee") {
+      return res.status(403).json({ message: "Unauthorized" });
+    }
+    const { email } = req.body;
+    if (!email) throw new Error("Email is required.");
+    const user = await User.findOne({ email });
+    if (!user) throw new Error("User not found.");
+    if (user.isVerified) res.status(200).json({ success: true, message: "User already verified",isVerified: true,email:user.email });
+    user.verifiedByType = "user";
+    user.verifiedBy = req.user.senderId;
+    user.isVerified = true;
+    const updatedUser = await user.save();
+    const userBankAccount = {
+      user: updatedUser._id,
+      accountNumber: `${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+      openedAt: new Date(),
+      location: user.createdLocation,
+    };
+    const account = await Account.create(userBankAccount);
+    console.log("✨ User Bank Account Created:");
+
+    res.status(200).json({ success:true, message: "✅ User verified successfully",isVerified: updatedUser.isVerified,email:updatedUser.email });
+  } catch (error) {
+    console.error("❌ Verification Error:", error.message);
+    res.status(400).json({
+      success: false,
+      message: error.message || "User verification failed",
     });
   }
 }
