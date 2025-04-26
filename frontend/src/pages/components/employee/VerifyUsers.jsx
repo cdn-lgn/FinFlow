@@ -7,12 +7,12 @@ import ShowUserDetails from './ShowUserDetails';
 const VerifyUsers = () => {
   const { colors } = useContext(ThemeContext);
   const [usersForVerification, setUsersForVerification] = useState([]);
-  const [userPopup,setUserPopup] = useState(false)
-  const [selectedUser,setSelectedUser] = useState()
+  const [userPopup, setUserPopup] = useState(false);
+  const [selectedUser, setSelectedUser] = useState();
 
   const handleVerify = async (user) => {
     try {
-      const response = await axiosClient.put("/user/verify",{email:user.email});
+      const response = await axiosClient.put("/user/verify", { email: user.email });
       console.log(response);
       if (response.status === 200 && response.data.isVerified) {
         setUsersForVerification((prevUsers) =>
@@ -20,16 +20,15 @@ const VerifyUsers = () => {
         );
         console.log('User verified and removed from pending list:', response.data);
       }
-
     } catch (error) {
-
+      console.error('Verification error:', error);
     }
   };
 
   const handleView = (user) => {
     console.log('View details for user:', user);
-    setUserPopup(true)
-    setSelectedUser(user)
+    setUserPopup(true);
+    setSelectedUser(user);
   };
 
   useEffect(() => {
@@ -41,7 +40,6 @@ const VerifyUsers = () => {
         console.error('Error fetching users:', error);
       }
     };
-
     fetchUsersForVerification();
   }, []);
 
@@ -51,11 +49,24 @@ const VerifyUsers = () => {
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
       className="flex-grow p-6 w-full overflow-y-auto"
+      style={{ backgroundColor: colors.background }}
     >
-      <h2 className="text-3xl font-semibold mb-6 text-white">Verify Users</h2>
+      <h2
+        className="text-3xl font-semibold mb-6"
+        style={{ color: colors.text }}
+      >
+        Verify Users
+      </h2>
+
+      {userPopup && (
+        <ShowUserDetails
+          setUserPopup={setUserPopup}
+          selectedUser={selectedUser}
+          setSelectedUser={setSelectedUser}
+        />
+      )}
 
       <div className="space-y-4">
-        {userPopup && <ShowUserDetails setUserPopup={setUserPopup} selectedUser={selectedUser} setSelectedUser={setSelectedUser} />}
         {usersForVerification?.map((user) => (
           <div
             key={user.phoneNumber}
@@ -67,16 +78,17 @@ const VerifyUsers = () => {
                 src={user.photoUrl || 'https://via.placeholder.com/150'}
                 alt={user.fullName}
                 className="w-16 h-16 rounded-full object-cover border-2"
+                style={{ borderColor: colors.primary }}
               />
               <div>
                 <h3 className="text-xl font-semibold" style={{ color: colors.text }}>
                   {user.fullName}
                 </h3>
                 <p className="text-sm" style={{ color: colors.text }}>
-                  <span className="font-medium text-gray-400">Email:</span> {user.email}
+                  <span style={{ color: colors.primaryDark, fontWeight: '500' }}>Email:</span> {user.email}
                 </p>
                 <p className="text-sm" style={{ color: colors.text }}>
-                  <span className="font-medium text-gray-400">Phone:</span> {user.phoneNumber}
+                  <span style={{ color: colors.primaryDark, fontWeight: '500' }}>Phone:</span> {user.phoneNumber}
                 </p>
               </div>
             </div>
@@ -87,7 +99,7 @@ const VerifyUsers = () => {
                 className="px-4 py-2 rounded-lg font-medium"
                 style={{
                   backgroundColor: colors.warning,
-                  color: '#fff',
+                  color: colors.text,
                 }}
               >
                 View
@@ -99,7 +111,7 @@ const VerifyUsers = () => {
                   className="px-4 py-2 rounded-lg font-medium"
                   style={{
                     backgroundColor: colors.primary,
-                    color: '#fff',
+                    color: "#fff",
                   }}
                 >
                   Verify
@@ -107,7 +119,11 @@ const VerifyUsers = () => {
               ) : (
                 <span
                   className="px-4 py-2 rounded-lg font-semibold"
-                  style={{ color: colors.success }}
+                  style={{
+                    color: colors.success,
+                    border: `1px solid ${colors.success}`,
+                    backgroundColor: "transparent",
+                  }}
                 >
                   Verified
                 </span>

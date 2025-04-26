@@ -203,7 +203,15 @@ export async function userVerificationAndUpdate(req, res) {
     if (!email) throw new Error("Email is required.");
     const user = await User.findOne({ email });
     if (!user) throw new Error("User not found.");
-    if (user.isVerified) res.status(200).json({ success: true, message: "User already verified",isVerified: true,email:user.email });
+    if (user.isVerified)
+      res
+        .status(200)
+        .json({
+          success: true,
+          message: "User already verified",
+          isVerified: true,
+          email: user.email,
+        });
     user.verifiedByType = "user";
     user.verifiedBy = req.user.senderId;
     user.isVerified = true;
@@ -217,12 +225,40 @@ export async function userVerificationAndUpdate(req, res) {
     const account = await Account.create(userBankAccount);
     console.log("✨ User Bank Account Created:");
 
-    res.status(200).json({ success:true, message: "✅ User verified successfully",isVerified: updatedUser.isVerified,email:updatedUser.email });
+    res
+      .status(200)
+      .json({
+        success: true,
+        message: "✅ User verified successfully",
+        isVerified: updatedUser.isVerified,
+        email: updatedUser.email,
+      });
   } catch (error) {
     console.error("❌ Verification Error:", error.message);
     res.status(400).json({
       success: false,
       message: error.message || "User verification failed",
+    });
+  }
+}
+
+export async function fetchUserList(req, res) {
+  try {
+    const users = await User.find({ role: "user" }).select(
+      "-password -__v -_id -updatedAt "
+    );
+    if (!users) throw new Error("No users found.");
+
+    res.status(200).json({
+      success: true,
+      message: "✅ Users fetched successfully",
+      users,
+    });
+  } catch (error) {
+    console.error("❌ Fetch Users Error:", error.message);
+    res.status(400).json({
+      success: false,
+      message: error.message || "Failed to fetch users",
     });
   }
 }
