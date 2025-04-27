@@ -90,6 +90,37 @@ const ShowUserDetails = ({ setUserPopup, selectedUser, setSelectedUser }) => {
                 </p>
               </div>
             </div>
+
+            {/* Account Details Section */}
+            {selectedUser.accountDetails && (
+              <div className="col-span-full mt-4">
+                <h3 className="font-semibold text-lg mb-2">Account Details</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <Detail label="Account Number" value={selectedUser.accountDetails.accountNumber} />
+                  <Detail label="Balance" value={`₹${selectedUser.accountDetails.balance.toLocaleString()}`} />
+                  <Detail
+                    label="Status"
+                    value={selectedUser.accountDetails.status}
+                    color={selectedUser.accountDetails.status === 'active' ? colors.success : colors.warning}
+                  />
+                  <Detail
+                    label="Total Transactions"
+                    value={selectedUser.accountDetails.transactions?.length || 0}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Location Section */}
+            {selectedUser.lastLoginLocation && (
+              <div className="col-span-full mt-4">
+                <h3 className="font-semibold text-lg mb-2">Last Login Location</h3>
+                <div className="text-sm" style={{ color: colors.subtext }}>
+                  <p>Latitude: {selectedUser.lastLoginLocation.latitude}</p>
+                  <p>Longitude: {selectedUser.lastLoginLocation.longitude}</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </motion.div>

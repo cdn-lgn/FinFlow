@@ -175,22 +175,11 @@ export async function userLogin(req, res) {
 
 export async function fetchUsersForVerfication(req, res) {
   try {
-    const users = await User.find({ isVerified: false, role: "user" }).select(
-      "-password -__v -_id -updatedAt "
-    );
-    if (!users) throw new Error("No users found for verification.");
-
-    res.status(200).json({
-      success: true,
-      message: "✅ Users fetched successfully",
-      users,
-    });
+    const users = await User.find({ isVerified: false })
+      .select('fullName email phoneNumber photoUrl isVerified');
+    res.status(200).json({ users });
   } catch (error) {
-    console.error("❌ Fetch Users Error:", error.message);
-    res.status(400).json({
-      success: false,
-      message: error.message || "Failed to fetch users",
-    });
+    res.status(500).json({ error: error.message });
   }
 }
 
@@ -262,3 +251,48 @@ export async function fetchUserList(req, res) {
     });
   }
 }
+
+export const fetchAccountHolders = async (req, res) => {
+  try {
+    const accountHolders = await Account.find()
+      .populate({
+        path: 'user',
+        select: 'fullName email phoneNumber photoUrl isVerified lastLoginLocation -_id'
+      })
+      .select('balance status accountNumber -_id');
+
+    const users = accountHolders.map(acc => ({
+      email: acc.user.email, // Use email as identifier
+      fullName: acc.user.fullName,
+      phoneNumber: acc.user.phoneNumber,
+      photoUrl: acc.user.photoUrl,
+      isVerified: acc.user.isVerified,
+      accountBalance: acc.balance,
+      accountStatus: acc.status,
+      accountNumber: acc.accountNumber
+    }));
+
+    res.status(200).json({ users });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const fetchUserDetails = async (req, res) => {
+  try {
+    const { email } = req.params; // Changed from userId to email
+    const user = await User.findOne({ email })
+      .select('+createdLocation +lastLoginLocation')
+      .select('-_id -__v'); // Explicitly exclude _id
+
+    const account = await Account.findOne({ user: user._id })
+      .select('-_id -user -__v'); // Exclude sensitive fields
+
+    res.status(200).json({
+      user,
+      accountDetails: account
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

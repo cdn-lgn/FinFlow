@@ -24,7 +24,7 @@ const Signup = () => {
   });
 const navigate = useNavigate();
   const [userFace, setUserFace] = useState(null);
-  const [mobileAndEmailVerified, setMobileAndEmailVerified] = useState(false);
+  const [mobileAndEmailVerified, setMobileAndEmailVerified] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
   const [otpTarget, setOtpTarget] = useState({});

@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { ThemeContext } from "../../../context/ThemeContext";
-import { FaUserCircle } from "react-icons/fa";
 import axiosClient from "../../../utils/axiosClient";
 import ShowUserDetails from "./ShowUserDetails";
 
@@ -24,93 +23,157 @@ const UserList = () => {
     fetchUsers();
   }, []);
 
-  const handleView = (user) => {
-    console.log("View details for user:", user);
-    setUserPopup(true);
-    setSelectedUser(user);
+  const handleView = async (user) => {
+    try {
+      const response = await axiosClient.get(`/user/${user.email}`);
+      setSelectedUser({
+        ...response.data.user,
+        accountDetails: response.data.accountDetails
+      });
+      setUserPopup(true);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
   };
+
+  const LoadingSkeleton = () => (
+    <div className="w-full space-y-4">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="animate-pulse p-4 rounded-lg border" style={{ backgroundColor: colors.card }}>
+          <div className="flex items-center space-x-6">
+            <div className="w-12 h-12 rounded-lg bg-gray-300"></div>
+            <div className="flex-1 space-y-3">
+              <div className="h-4 bg-gray-300 rounded w-1/4"></div>
+              <div className="h-3 bg-gray-300 rounded w-1/3"></div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: -30 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.5 }}
-      className="flex-grow p-6 w-full overflow-y-auto"
-      style={{ backgroundColor: colors.background }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="w-full h-[calc(100vh-4rem)] overflow-auto"
     >
-      <h2
-        className="text-3xl font-semibold mb-6"
-        style={{ color: colors.text }}
-      >
-        User List
-      </h2>
+      <div className="w-full max-w-[1400px] mx-auto p-4 lg:p-6">
+        <header className="mb-6 sticky top-0 z-10 backdrop-blur-sm">
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-semibold" style={{ color: colors.primaryDark }}>
+              Registered Users
+            </h2>
+            <div className="px-4 py-2 rounded-lg"
+              style={{
+                backgroundColor: colors.primary + '15',
+                color: colors.primary
+              }}>
+              {users?.length || 0} Total Users
+            </div>
+          </div>
+          <div className="mt-2 text-sm" style={{ color: colors.text + '80' }}>
+            View and manage registered user accounts
+          </div>
+        </header>
 
-      {userPopup && (
-        <ShowUserDetails
+        {userPopup && <ShowUserDetails
           setUserPopup={setUserPopup}
           selectedUser={selectedUser}
           setSelectedUser={setSelectedUser}
-        />
-      )}
+        />}
 
-      <div className="space-y-4">
-        {users?.map((user) => (
-          <div
-            key={user.email}
-            className="p-5 rounded-lg shadow-md flex flex-col md:flex-row items-center md:items-start justify-between gap-4"
-            style={{ backgroundColor: colors.card }}
-          >
-            <div className="flex items-center gap-4 w-full md:w-2/3">
-              <img
-                src={user.photoUrl || "https://via.placeholder.com/150"}
-                alt={user.fullName}
-                className="w-16 h-16 rounded-full object-cover border-2"
-                style={{ borderColor: colors.primary }}
-              />
-              <div>
-                <h3
-                  className="text-xl font-semibold"
-                  style={{ color: colors.text }}
-                >
-                  {user.fullName}
-                </h3>
-                <p className="text-sm" style={{ color: colors.text }}>
-                  <span
-                    className="font-medium"
-                    style={{ color: colors.warning }}
-                  >
-                    Email:
-                  </span>{" "}
-                  {user.email}
-                </p>
-                {user.status && (
-                  <p className="text-sm" style={{ color: colors.text }}>
-                    <span
-                      className="font-medium"
-                      style={{ color: colors.success }}
-                    >
-                      Status:
-                    </span>{" "}
-                    {user.status}
-                  </p>
-                )}
-              </div>
-            </div>
-
-            <div className="flex gap-3 w-full md:w-auto justify-end">
-              <button
-                onClick={() => handleView(user)}
-                className="px-4 py-2 rounded-lg font-medium"
+        {!users ? (
+          <LoadingSkeleton />
+        ) : users.length === 0 ? (
+          <div className="w-full h-[60vh] flex items-center justify-center rounded-lg shadow-sm"
+               style={{ backgroundColor: colors.card }}>
+            <p className="text-lg font-medium" style={{ color: colors.primaryDark }}>
+              No registered users found
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {users.map((user) => (
+              <motion.div
+                key={user.email}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="w-full p-4 rounded-lg border flex items-start justify-between gap-4"
                 style={{
-                  backgroundColor: colors.warning,
-                  color: "#fff",
+                  backgroundColor: colors.card,
+                  borderColor: colors.border
                 }}
               >
-                View
-              </button>
-            </div>
+                <div className="flex items-start space-x-4 flex-grow">
+                  <div className="relative">
+                    <img
+                      src={user.photoUrl || 'https://via.placeholder.com/150'}
+                      alt=""
+                      className="w-12 h-12 rounded-lg object-cover border"
+                      style={{ borderColor: colors.border }}
+                    />
+                    <div className="absolute -top-1.5 -right-1.5 w-3 h-3 rounded-full border-2"
+                      style={{
+                        backgroundColor: user.isVerified ? colors.success : colors.warning,
+                        borderColor: colors.card
+                      }}
+                    />
+                  </div>
+
+                  <div className="flex-grow">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="text-lg font-medium" style={{ color: colors.text }}>
+                        {user.fullName}
+                      </h3>
+                      <span className="text-sm px-3 py-1 rounded-full"
+                        style={{
+                          backgroundColor: colors.primary + '15',
+                          color: colors.primary
+                        }}>
+                        Acc: {user.accountNumber}
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="text-sm" style={{ color: colors.text }}>
+                        <span className="font-medium">Email: </span>
+                        {user.email}
+                      </div>
+                      <div className="text-sm" style={{ color: colors.text }}>
+                        <span className="font-medium">Phone: </span>
+                        {user.phoneNumber}
+                      </div>
+                      <div className="text-sm" style={{ color: colors.text }}>
+                        <span className="font-medium">Balance: </span>
+                        ₹{user.accountBalance.toLocaleString()}
+                      </div>
+                      <div className="text-sm" style={{ color: colors.text }}>
+                        <span className="font-medium">Status: </span>
+                        <span style={{ color: user.accountStatus === 'active' ? colors.success : colors.warning }}>
+                          {user.accountStatus}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 shrink-0">
+                  <button
+                    onClick={() => handleView(user)}
+                    className="px-3 py-1.5 rounded text-sm font-medium transition-colors"
+                    style={{
+                      background: colors.gradient,
+                      color: "#fff",
+                    }}
+                  >
+                    View Details
+                  </button>
+                </div>
+              </motion.div>
+            ))}
           </div>
-        ))}
+        )}
       </div>
     </motion.div>
   );
