@@ -4,6 +4,8 @@ import upload from "../config/multer.js";
 import { authenticateJWT } from "../middleware/authenticateJWT.js";
 
 const userRouter = Router();
+userRouter.get("/account-stats", authenticateJWT, getAccountStats); // Keep at top and ensure correct path
+
 userRouter.post("/registration", upload.single("image"), userRegistration);
 userRouter.get("/verification",authenticateJWT,fetchUsersForVerfication)
 userRouter.put("/verify",authenticateJWT,userVerificationAndUpdate)
@@ -16,8 +18,5 @@ userRouter.get("/dashboard-stats", authenticateJWT, getDashboardStats);
 // User specific routes
 userRouter.post("/send-money", authenticateJWT, sendMoney);
 userRouter.post("/request-money", authenticateJWT, requestMoney);
-
-// Keep this route under /users/
-userRouter.get("/account-stats", authenticateJWT, getAccountStats);
 
 export default userRouter;

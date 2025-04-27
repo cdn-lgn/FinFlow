@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { PanCard } from "../models/pan_card.models.js";
 import { Account } from "../models/account.models.js";
+import { Transaction } from "../models/transaction.models.js";
 dotenv.config();
 
 export async function userRegistration(req, res) {
@@ -366,34 +367,54 @@ export const getDashboardStats = async (req, res) => {
 
 export const getAccountStats = async (req, res) => {
   try {
-    // Find user's account
-    const account = await Account.findOne({ user: req.user._id })
-      .populate({
-        path: 'transactions',
-        options: { sort: { createdAt: -1 }, limit: 5 }
-      });
+    const userId = req.user._id;
+    // First find user's account
+    const userAccount = await Account.findOne({ user: userId });
 
-    if (!account) {
-      return res.status(404).json({ error: "Account not found" });
+    if (!userAccount) {
+      return res.status(404).json({
+        success: false,
+        error: "Account not found"
+      });
     }
 
-    // Format the response
+    // Get recent transactions
+    const recentTransactions = await Transaction.find({
+      $or: [
+        { fromUser: userId },
+        { toUser: userId }
+      ]
+    })
+    .sort({ createdAt: -1 })
+    .limit(5)
+    .lean();
+
+    // Format transactions
+    const formattedTransactions = recentTransactions.map(tx => ({
+      type: tx.fromUser.equals(userId) ? 'debit' : 'credit',
+      amount: tx.amount,
+      description: tx.remarks || `${tx.type.charAt(0).toUpperCase() + tx.type.slice(1)} transaction`,
+      timestamp: tx.createdAt,
+      status: tx.status
+    }));
+
     const accountStats = {
-      balance: account.balance,
-      accountNumber: account.accountNumber,
-      status: account.status,
-      recentTransactions: account.transactions?.map(tx => ({
-        type: tx.type,
-        amount: tx.amount,
-        description: tx.description || `${tx.type === 'credit' ? 'Received from' : 'Sent to'} ${tx.counterparty}`,
-        timestamp: tx.createdAt
-      })) || []
+      balance: userAccount.balance || 0,
+      accountNumber: userAccount.accountNumber,
+      status: userAccount.status,
+      recentTransactions: formattedTransactions
     };
 
-    res.status(200).json(accountStats);
+    res.status(200).json({
+      success: true,
+      ...accountStats
+    });
   } catch (error) {
-    console.error('Error getting account stats:', error);
-    res.status(500).json({ error: error.message });
+    console.error('Error fetching account stats:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
   }
 };
 

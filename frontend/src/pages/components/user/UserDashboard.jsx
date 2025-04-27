@@ -78,7 +78,7 @@ const UserDashboard = () => {
   useEffect(() => {
     const fetchAccountStats = async () => {
       try {
-        const response = await axiosClient.get('/users/account-stats'); // Changed back to /users/
+        const response = await axiosClient.get('/users/account-stats');  // Changed back to /users/
         setAccountStats(response.data);
       } catch (error) {
         console.error('Error fetching account stats:', error);
