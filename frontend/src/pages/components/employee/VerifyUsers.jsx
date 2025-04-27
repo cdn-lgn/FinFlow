@@ -9,6 +9,7 @@ const VerifyUsers = () => {
   const [usersForVerification, setUsersForVerification] = useState([]);
   const [userPopup, setUserPopup] = useState(false);
   const [selectedUser, setSelectedUser] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   const handleVerify = async (user) => {
     try {
@@ -25,19 +26,29 @@ const VerifyUsers = () => {
     }
   };
 
-  const handleView = (user) => {
-    console.log('View details for user:', user);
-    setUserPopup(true);
-    setSelectedUser(user);
+  const handleView = async (user) => {
+    try {
+      const response = await axiosClient.get(`/users/details/${user.email}`);
+      setSelectedUser({
+        ...response.data.user,
+        accountDetails: response.data.accountDetails
+      });
+      setUserPopup(true);
+    } catch (error) {
+      console.error("Error fetching user details:", error);
+    }
   };
 
   useEffect(() => {
     const fetchUsersForVerification = async () => {
       try {
+        setIsLoading(true);
         const response = await axiosClient.get('/users/verification');
         setUsersForVerification(response.data.users);
       } catch (error) {
         console.error('Error fetching users:', error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchUsersForVerification();
@@ -90,9 +101,9 @@ const VerifyUsers = () => {
           setSelectedUser={setSelectedUser}
         />}
 
-        {!usersForVerification ? (
+        {isLoading ? (
           <LoadingSkeleton />
-        ) : usersForVerification.length === 0 ? (
+        ) : !usersForVerification?.length ? (
           <div className="w-full h-[60vh] flex items-center justify-center rounded-lg shadow-sm"
                style={{ backgroundColor: colors.card }}>
             <p className="text-lg font-medium" style={{ color: colors.primaryDark }}>

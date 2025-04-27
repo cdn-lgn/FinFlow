@@ -9,15 +9,19 @@ const UserList = () => {
   const [users, setUsers] = useState([]);
   const [userPopup, setUserPopup] = useState(false);
   const [selectedUser, setSelectedUser] = useState();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
+        setIsLoading(true);
         const response = await axiosClient.get("/users/userList");
         setUsers(response.data.users);
         console.log(response.data.users);
       } catch (error) {
         console.error("Error fetching users:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchUsers();
@@ -25,7 +29,7 @@ const UserList = () => {
 
   const handleView = async (user) => {
     try {
-      const response = await axiosClient.get(`/user/${user.email}`);
+      const response = await axiosClient.get(`/users/details/${user.email}`);
       setSelectedUser({
         ...response.data.user,
         accountDetails: response.data.accountDetails
@@ -83,9 +87,9 @@ const UserList = () => {
           setSelectedUser={setSelectedUser}
         />}
 
-        {!users ? (
+        {isLoading ? (
           <LoadingSkeleton />
-        ) : users.length === 0 ? (
+        ) : !users?.length ? (
           <div className="w-full h-[60vh] flex items-center justify-center rounded-lg shadow-sm"
                style={{ backgroundColor: colors.card }}>
             <p className="text-lg font-medium" style={{ color: colors.primaryDark }}>

@@ -173,15 +173,16 @@ export async function userLogin(req, res) {
   }
 }
 
-export async function fetchUsersForVerfication(req, res) {
+export const fetchUsersForVerfication = async (req, res) => {
   try {
     const users = await User.find({ isVerified: false })
-      .select('fullName email phoneNumber photoUrl isVerified');
+      .select('fullName email phoneNumber photoUrl isVerified')
+      .lean(); // Use lean() for better performance
     res.status(200).json({ users });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
-}
+};
 
 export async function userVerificationAndUpdate(req, res) {
   try {
@@ -257,12 +258,14 @@ export const fetchAccountHolders = async (req, res) => {
     const accountHolders = await Account.find()
       .populate({
         path: 'user',
-        select: 'fullName email phoneNumber photoUrl isVerified lastLoginLocation -_id'
+        select: 'fullName email phoneNumber photoUrl isVerified',
+        options: { lean: true }
       })
-      .select('balance status accountNumber -_id');
+      .select('balance status accountNumber')
+      .lean();
 
     const users = accountHolders.map(acc => ({
-      email: acc.user.email, // Use email as identifier
+      email: acc.user.email,
       fullName: acc.user.fullName,
       phoneNumber: acc.user.phoneNumber,
       photoUrl: acc.user.photoUrl,
@@ -280,18 +283,135 @@ export const fetchAccountHolders = async (req, res) => {
 
 export const fetchUserDetails = async (req, res) => {
   try {
-    const { email } = req.params; // Changed from userId to email
+    const { email } = req.params;
     const user = await User.findOne({ email })
-      .select('+createdLocation +lastLoginLocation')
-      .select('-_id -__v'); // Explicitly exclude _id
+      .select('+createdLocation +lastLoginLocation +address'); // Include necessary fields
 
-    const account = await Account.findOne({ user: user._id })
-      .select('-_id -user -__v'); // Exclude sensitive fields
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    // If user has an account, fetch account details
+    const account = user.isVerified ?
+      await Account.findOne({ user: user._id })
+        .select('balance status accountNumber transactions') : null;
 
     res.status(200).json({
-      user,
+      user: {
+        fullName: user.fullName,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+        photoUrl: user.photoUrl,
+        isVerified: user.isVerified,
+        isEmailAndMobileVerified: user.isEmailAndMobileVerified,
+        role: user.role,
+        dob: user.dob,
+        pan: user.pan,
+        fatherName: user.fatherName,
+        address: user.address,
+        createdLocation: user.createdLocation,
+        lastLoginLocation: user.lastLoginLocation,
+        createdAt: user.createdAt
+      },
       accountDetails: account
     });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getDashboardStats = async (req, res) => {
+  try {
+    // Get total users count (only role="user")
+    const totalUsers = await User.countDocuments({
+      role: "user",
+      isVerified: true
+    });
+
+    // Get pending verifications count
+    const pendingVerifications = await User.countDocuments({
+      role: "user",
+      isVerified: false
+    });
+
+    // Get active accounts count
+    const activeAccounts = await Account.countDocuments({ status: 'active' });
+
+    // Get recent verifications with proper date formatting
+    const recentVerifications = await User.find({
+      role: "user",
+      isVerified: true,
+      verifiedAt: { $ne: null }
+    })
+    .select('fullName email verifiedAt')
+    .sort({ verifiedAt: -1 })
+    .limit(5)
+    .lean()
+    .then(users => users.map(user => ({
+      ...user,
+      verifiedAt: user.verifiedAt.toISOString()
+    })));
+
+    res.status(200).json({
+      totalUsers,
+      pendingVerifications,
+      activeAccounts,
+      recentVerifications
+    });
+  } catch (error) {
+    console.error('Dashboard stats error:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const getAccountStats = async (req, res) => {
+  try {
+    // Find user's account
+    const account = await Account.findOne({ user: req.user._id })
+      .populate({
+        path: 'transactions',
+        options: { sort: { createdAt: -1 }, limit: 5 }
+      });
+
+    if (!account) {
+      return res.status(404).json({ error: "Account not found" });
+    }
+
+    // Format the response
+    const accountStats = {
+      balance: account.balance,
+      accountNumber: account.accountNumber,
+      status: account.status,
+      recentTransactions: account.transactions?.map(tx => ({
+        type: tx.type,
+        amount: tx.amount,
+        description: tx.description || `${tx.type === 'credit' ? 'Received from' : 'Sent to'} ${tx.counterparty}`,
+        timestamp: tx.createdAt
+      })) || []
+    };
+
+    res.status(200).json(accountStats);
+  } catch (error) {
+    console.error('Error getting account stats:', error);
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const sendMoney = async (req, res) => {
+  try {
+    const { receiverAccountNumber, amount } = req.body;
+    // Implement transaction logic
+    res.status(200).json({ message: "Money sent successfully" });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+export const requestMoney = async (req, res) => {
+  try {
+    const { fromAccountNumber, amount } = req.body;
+    // Implement request logic
+    res.status(200).json({ message: "Money request sent" });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
