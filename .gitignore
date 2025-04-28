@@ -1,1 +1,25 @@
-/.credentials
+# Ignore node_modules everywhere
+**/node_modules/
+
+# Ignore env files everywhere
+**/.env
+
+# Ignore build output
+**/dist/
+**/build/
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary folders
+temp/
+tmp/
+
+# Ignore IDE settings
+.vscode/
+.idea/
+
