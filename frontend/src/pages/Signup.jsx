@@ -5,6 +5,8 @@ import { motion } from "framer-motion";
 import axiosClient from "../utils/axiosClient";
 import OtpVerify from "./components/OtpVerify";
 import { useNavigate } from "react-router-dom";
+import LoadingButton from "../components/LoadingButton";
+import getLocation from "../utils/getLocation";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -22,7 +24,7 @@ const Signup = () => {
     createdLocation: {},
     country: "India",
   });
-const navigate = useNavigate();
+  const navigate = useNavigate();
   const [userFace, setUserFace] = useState(null);
   const [mobileAndEmailVerified, setMobileAndEmailVerified] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
@@ -32,20 +34,21 @@ const navigate = useNavigate();
   const [isImageCaptured, setIsImageCaptured] = useState(true);
   const [dobError, setDobError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
+    const fetchLocation = async () => {
+      try {
+        const location = await getLocation();
         setFormData((prev) => ({
           ...prev,
-          createdLocation: {
-            latitude: pos.coords.latitude,
-            longitude: pos.coords.longitude,
-          },
+          createdLocation: location,
         }));
-      },
-      (err) => console.error("Location Error:", err)
-    );
+      } catch (error) {
+        console.error("Location Error:", error);
+      }
+    };
+    fetchLocation();
   }, []);
 
   useEffect(() => {
@@ -102,6 +105,7 @@ const navigate = useNavigate();
 
   const handleSubmit = async () => {
     if (!validateDOB(formData.dob)) return;
+    setIsLoading(true);
 
     const form = new FormData();
 
@@ -115,15 +119,18 @@ const navigate = useNavigate();
     if (userFace) {
       form.append("image", userFace);
     }
-    if(mobileAndEmailVerified) {
+    if (mobileAndEmailVerified) {
       form.append("isEmailAndMobileVerified", "true");
     }
 
     try {
       const response = await axiosClient.post("/user/registration", form);
-      if(response?.data?.success) navigate("/verify", { state: { result: response.data } });
+      if (response?.data?.success)
+        navigate("/verify", { state: { result: response.data } });
     } catch (error) {
       console.error("❌ Upload Error:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -348,17 +355,19 @@ const navigate = useNavigate();
 
         {/* Submit Button */}
         <div className="mt-10 text-center">
-          <button
+          <LoadingButton
+            isLoading={isLoading}
             onClick={handleSubmit}
             disabled={!isFormValid}
-            className={`btn  ${
+            className={`btn ${
               !isFormValid
                 ? "opacity-50 cursor-not-allowed text-black"
                 : "bg-blue-500 text-white"
             }`}
+            loadingText="Creating Account..."
           >
             Create Account
-          </button>
+          </LoadingButton>
         </div>
       </motion.div>
     </div>

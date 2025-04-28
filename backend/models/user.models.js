@@ -52,7 +52,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "PAN number is required."],
       unique: true,
-      match: [/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"],
+      // match: [/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN format"],
     },
     photoUrl: {
       type: String,

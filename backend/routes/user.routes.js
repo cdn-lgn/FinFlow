@@ -1,5 +1,22 @@
 import { Router } from "express";
-import { fetchUserList, fetchUsersForVerfication, userLogin, userRegistration, userVerificationAndUpdate, fetchUserDetails, fetchAccountHolders, getDashboardStats, getAccountStats, sendMoney, requestMoney } from "../controllers/user.controllers.js";
+import {
+  fetchUserList,
+  fetchUsersForVerfication,
+  userLogin,
+  userRegistration,
+  userVerificationAndUpdate,
+  fetchUserDetails,
+  fetchAccountHolders,
+  getDashboardStats,
+  getAccountStats,
+  sendMoney,
+  requestMoney,
+  getTransactions,
+  setTransactionPin,
+  changeTransactionPin,
+  changePassword,
+  depositMoney
+} from "../controllers/user.controllers.js";
 import upload from "../config/multer.js";
 import { authenticateJWT } from "../middleware/authenticateJWT.js";
 
@@ -18,5 +35,12 @@ userRouter.get("/dashboard-stats", authenticateJWT, getDashboardStats);
 // User specific routes
 userRouter.post("/send-money", authenticateJWT, sendMoney);
 userRouter.post("/request-money", authenticateJWT, requestMoney);
+userRouter.get('/transactions', authenticateJWT, getTransactions);
+userRouter.post("/deposit", authenticateJWT, depositMoney);
+
+// Security routes
+userRouter.post("/set-pin", authenticateJWT, setTransactionPin);
+userRouter.post("/change-pin", authenticateJWT, changeTransactionPin);
+userRouter.post("/change-password", authenticateJWT, changePassword);
 
 export default userRouter;

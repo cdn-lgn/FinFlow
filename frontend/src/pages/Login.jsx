@@ -5,11 +5,12 @@ import axiosClient from '../utils/axiosClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
+import LoadingButton from '../components/LoadingButton';
+import getLocation from '../utils/getLocation';
 
 const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
 
   const { colors } = useContext(ThemeContext);
   const [showPassword, setShowPassword] = useState(false);
@@ -17,18 +18,21 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
   const handleRoleChange = (e) => setRole(e.target.value);
 
   const handleLogin = async () => {
     setError('');
+    setIsLoading(true);
     try {
+      const location = await getLocation();
       const res = await axiosClient.post(
         '/user/login',
-        { email, password, role }
+        { email, password, role, location }
       );
-      console.log('✅ Logged in:', res.data);
+
       if(res.data?.userData?.fullName) {
         dispatch(setUser(res.data.userData));
         navigate(`/${role}`);
@@ -36,9 +40,10 @@ const Login = () => {
     } catch (err) {
       console.error('❌ Login error:', err);
       setError(err.response?.data?.message || 'Login failed. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
-
 
   return (
     <div className={`h-screen w-screen flex items-center justify-center bg-${colors.background} text-${colors.text}`}>
@@ -111,13 +116,14 @@ const Login = () => {
         )}
 
         {/* Login Button */}
-        <button
+        <LoadingButton
+          isLoading={isLoading}
           onClick={handleLogin}
           className={`w-full py-3 rounded-md hover:opacity-100 hover:text-white opacity-95 transition duration-200 ease-in-out font-semibold`}
           style={{ backgroundColor: colors.primary }}
         >
           Login as {role.charAt(0).toUpperCase() + role.slice(1)}
-        </button>
+        </LoadingButton>
 
         {/* Footer Actions */}
         <div className={`mt-4 flex justify-between text-sm text-${colors.text}`}>

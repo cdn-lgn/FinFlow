@@ -30,11 +30,11 @@ const QuickActionCard = ({ icon: Icon, title, description, color, onClick }) => 
 
 const RecentTransactions = ({ transactions = [], colors }) => (
   <div className="rounded-lg p-4" style={{ backgroundColor: colors.card }}>
-    <h3 className="text-lg font-semibold mb-4" style={{ color: colors.primaryDark }}>
+    <h3 className="text-lg font-semibold mb-4" style={{ color: colors.text }}>
       Recent Transactions
     </h3>
     {transactions.length === 0 ? (
-      <p className="text-center py-4" style={{ color: colors.text + '80' }}>
+      <p className="text-center py-4" style={{ color: colors.text }}>
         No recent transactions
       </p>
     ) : (
@@ -43,13 +43,13 @@ const RecentTransactions = ({ transactions = [], colors }) => (
           <div
             key={index}
             className="flex items-center justify-between p-3 rounded-lg"
-            style={{ backgroundColor: colors.background }}
+            style={{ backgroundColor: colors.background, color: colors.text }}
           >
             <div>
-              <p className="font-medium" style={{ color: colors.text }}>
+              <p className="font-medium">
                 {tx.type === 'credit' ? 'Received' : 'Sent'} ₹{tx.amount.toLocaleString()}
               </p>
-              <p className="text-sm" style={{ color: colors.text + '80' }}>
+              <p className="text-sm">
                 {tx.description}
               </p>
             </div>
@@ -57,7 +57,7 @@ const RecentTransactions = ({ transactions = [], colors }) => (
               <p className="text-sm" style={{ color: tx.type === 'credit' ? colors.success : colors.danger }}>
                 {tx.type === 'credit' ? '+' : '-'}₹{tx.amount.toLocaleString()}
               </p>
-              <p className="text-xs" style={{ color: colors.text + '60' }}>
+              <p className="text-xs">
                 {dayjs(tx.timestamp).format('DD MMM, HH:mm')}
               </p>
             </div>

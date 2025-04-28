@@ -1,138 +1,220 @@
-import React, { useContext, useState } from "react";
-import { motion } from "framer-motion";
-import { ThemeContext } from "../../../context/ThemeContext";
-import { FaMoneyBillWave, FaRegArrowAltCircleUp } from "react-icons/fa";
-
-// Dummy Data
-const dummyTransactions = [
-  { id: 1, date: '2025-04-01', amount: 4500, type: 'Credit', status: 'Success' },
-  { id: 2, date: '2025-04-02', amount: 1200, type: 'Debit', status: 'Pending' },
-  { id: 3, date: '2025-04-03', amount: 700, type: 'Debit', status: 'Failed' },
-];
-
-// Components inside Tabs
-const TransactionTable = ({ colors }) => (
-  <div className={`bg-${colors.card} text-${colors.text} overflow-x-auto p-4 rounded-xl`}>
-    <h2 className={`text-xl font-semibold text-${colors.text} mb-4`}>All Transactions</h2>
-    <table className="min-w-full table-auto">
-      <thead>
-        <tr>
-          <th className="text-left px-4 py-2">ID</th>
-          <th className="text-left px-4 py-2">Date</th>
-          <th className="text-left px-4 py-2">Amount</th>
-          <th className="text-left px-4 py-2">Type</th>
-          <th className="text-left px-4 py-2">Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {dummyTransactions.map((txn) => (
-          <tr key={txn.id}>
-            <td className="px-4 py-2">{txn.id}</td>
-            <td className="px-4 py-2">{txn.date}</td>
-            <td className="px-4 py-2">₹{txn.amount}</td>
-            <td className="px-4 py-2">{txn.type}</td>
-            <td
-              className={`px-4 py-2 font-semibold ${
-                txn.status === "Success"
-                  ? `text-${colors.success}`
-                  : txn.status === "Pending"
-                  ? `text-${colors.warning}`
-                  : `text-${colors.danger}`
-              }`}
-            >
-              {txn.status}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-);
-
-const SendMoney = ({ colors }) => (
-  <motion.div
-    initial={{ opacity: 0, x: 50 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: -50 }}
-    transition={{ duration: 0.5 }}
-  >
-    <div
-      className={`bg-${colors.card} text-${colors.text} p-4 rounded-xl shadow-lg`}
-    >
-      <h3 className={`text-xl font-semibold text-${colors.text}`}>Send Money 🤑</h3>
-      <p className="mt-1 text-sm">(Form coming soon...)</p>
-    </div>
-  </motion.div>
-);
-
-const RaiseFund = ({ colors }) => (
-  <motion.div
-    initial={{ opacity: 0, x: -50 }}
-    animate={{ opacity: 1, x: 0 }}
-    exit={{ opacity: 0, x: 50 }}
-    transition={{ duration: 0.5 }}
-  >
-    <div
-      className={`bg-${colors.card} text-${colors.text} p-4 rounded-xl shadow-lg`}
-    >
-      <h3 className="text-xl font-semibold">Raise Fund 🙌</h3>
-      <p className="mt-1 text-sm">(Raise funds feature coming soon...)</p>
-    </div>
-  </motion.div>
-);
+import React, { useState, useContext, useEffect } from 'react';
+import { ThemeContext } from '../../../context/ThemeContext';
+import { motion } from 'framer-motion';
+import { FaMoneyBill, FaArrowRight, FaArrowLeft, FaSearch, FaCreditCard } from 'react-icons/fa';
+import { FiCalendar, FiFilter } from 'react-icons/fi';
+import axiosClient from '../../../utils/axiosClient';
+import dayjs from 'dayjs';
+import TransactionModal from '../../../components/TransactionModal';
+import CardDepositModal from '../../../components/CardDepositModal';
 
 const Transactions = () => {
   const { colors } = useContext(ThemeContext);
-  const [tab, setTab] = useState(0);
+  const [transactions, setTransactions] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalType, setModalType] = useState('send');
+  const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [filters, setFilters] = useState({
+    type: 'all',
+    dateFrom: '',
+    dateTo: '',
+    search: ''
+  });
+  const [showCardDeposit, setShowCardDeposit] = useState(false);
 
-  const handleTabChange = (newTab) => setTab(newTab);
+  useEffect(() => {
+    fetchTransactions();
+  }, []);
+
+  const fetchTransactions = async () => {
+    try {
+      const response = await axiosClient.get('/users/transactions');
+      setTransactions(response.data.transactions);
+    } catch (error) {
+      console.error('Error fetching transactions:', error);
+    }
+  };
+
+  const handleAction = (type) => {
+    setModalType(type);
+    setIsModalOpen(true);
+  };
+
+  const handleTransactionClick = (tx) => {
+    setSelectedTransaction(tx);
+  };
+
+  const handleDepositSuccess = () => {
+    fetchTransactions();
+  };
+
+  const filteredTransactions = transactions.filter(tx => {
+    if (filters.type !== 'all' && tx.type !== filters.type) return false;
+    if (filters.search && !tx.description.toLowerCase().includes(filters.search.toLowerCase())) return false;
+    if (filters.dateFrom && new Date(tx.timestamp) < new Date(filters.dateFrom)) return false;
+    if (filters.dateTo && new Date(tx.timestamp) > new Date(filters.dateTo)) return false;
+    return true;
+  });
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -30 }}
-      transition={{ duration: 0.5 }}
-      className="p-4 w-full"
-    >
-      <h2 className={`text-3xl font-semibold text-${colors.text} mb-4`}>
-        Transactions Section 💸
-      </h2>
-
-      {/* Tabs */}
-      <div className="flex space-x-4 mb-6">
-        <button
-          onClick={() => handleTabChange(0)}
-          className={`${
-            tab === 0 ? "text-primary border-b-2 border-primary" : "text-gray-500"
-          } text-lg font-medium py-2 px-4`}
+    <div className="p-6">
+      {/* Filter Section */}
+      <div className="mb-6 grid grid-cols-1 md:grid-cols-4 gap-4"
+           style={{ backgroundColor: colors.card, padding: '1rem', borderRadius: '0.5rem' }}>
+        <input
+          type="text"
+          placeholder="Search transactions..."
+          value={filters.search}
+          onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
+          className="p-2 rounded"
+          style={{ backgroundColor: colors.background, color: colors.text }}
+        />
+        <select
+          value={filters.type}
+          onChange={(e) => setFilters(prev => ({ ...prev, type: e.target.value }))}
+          className="p-2 rounded"
+          style={{ backgroundColor: colors.background, color: colors.text }}
         >
-          View Transactions
-        </button>
-        <button
-          onClick={() => handleTabChange(1)}
-          className={`${
-            tab === 1 ? "text-primary border-b-2 border-primary" : "text-gray-500"
-          } text-lg font-medium py-2 px-4`}
-        >
-          Send Money <FaMoneyBillWave className="inline-block ml-1" />
-        </button>
-        <button
-          onClick={() => handleTabChange(2)}
-          className={`${
-            tab === 2 ? "text-primary border-b-2 border-primary" : "text-gray-500"
-          } text-lg font-medium py-2 px-4`}
-        >
-          Raise Fund <FaRegArrowAltCircleUp className="inline-block ml-1" />
-        </button>
+          <option value="all">All Types</option>
+          <option value="credit">Credit</option>
+          <option value="debit">Debit</option>
+        </select>
+        <input
+          type="date"
+          value={filters.dateFrom}
+          onChange={(e) => setFilters(prev => ({ ...prev, dateFrom: e.target.value }))}
+          className="p-2 rounded"
+          style={{ backgroundColor: colors.background, color: colors.text }}
+        />
+        <input
+          type="date"
+          value={filters.dateTo}
+          onChange={(e) => setFilters(prev => ({ ...prev, dateTo: e.target.value }))}
+          className="p-2 rounded"
+          style={{ backgroundColor: colors.background, color: colors.text }}
+        />
       </div>
 
-      <div>
-        {tab === 0 && <TransactionTable colors={colors} />}
-        {tab === 1 && <SendMoney colors={colors} />}
-        {tab === 2 && <RaiseFund colors={colors} />}
+      {/* Quick Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          className="p-4 rounded-lg cursor-pointer"
+          style={{ backgroundColor: colors.card }}
+          onClick={() => handleAction('send')}
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-lg" style={{ backgroundColor: colors.primary + '15' }}>
+              <FaArrowRight size={24} style={{ color: colors.primary }} />
+            </div>
+            <div>
+              <h3 className="font-medium" style={{ color: colors.text }}>Send Money</h3>
+              <p className="text-sm" style={{ color: colors.text + '80' }}>Transfer to another account</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          className="p-4 rounded-lg cursor-pointer"
+          style={{ backgroundColor: colors.card }}
+          onClick={() => handleAction('request')}
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-lg" style={{ backgroundColor: colors.warning + '15' }}>
+              <FaArrowLeft size={24} style={{ color: colors.warning }} />
+            </div>
+            <div>
+              <h3 className="font-medium" style={{ color: colors.text }}>Request Money</h3>
+              <p className="text-sm" style={{ color: colors.text + '80' }}>Request payment from others</p>
+            </div>
+          </div>
+        </motion.div>
+
+        <motion.div
+          whileHover={{ scale: 1.02 }}
+          className="p-4 rounded-lg cursor-pointer"
+          style={{ backgroundColor: colors.card }}
+          onClick={() => setShowCardDeposit(true)}
+        >
+          <div className="flex items-center gap-4">
+            <div className="p-3 rounded-lg" style={{ backgroundColor: colors.success + '15' }}>
+              <FaCreditCard size={24} style={{ color: colors.success }} />
+            </div>
+            <div>
+              <h3 className="font-medium" style={{ color: colors.text }}>Add Money</h3>
+              <p className="text-sm" style={{ color: colors.text + '80' }}>Deposit via card</p>
+            </div>
+          </div>
+        </motion.div>
       </div>
-    </motion.div>
+
+      {/* Transactions List */}
+      <div className="space-y-4">
+        {filteredTransactions.map((tx, index) => (
+          <motion.div
+            key={index}
+            onClick={() => handleTransactionClick(tx)}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1 }}
+            className="p-4 border-b last:border-b-0 flex items-center justify-between"
+            style={{ borderColor: colors.border }}
+          >
+            <div className="flex items-center gap-4">
+              <div className="p-2 rounded-full" style={{
+                backgroundColor: tx.type === 'credit' ? colors.success + '15' : colors.danger + '15',
+                color: tx.type === 'credit' ? colors.success : colors.danger
+              }}>
+                {tx.type === 'credit' ? <FaArrowLeft /> : <FaArrowRight />}
+              </div>
+              <div>
+                <p className="font-medium" style={{ color: colors.text }}>{tx.description}</p>
+                <p className="text-sm" style={{ color: colors.text + '60' }}>
+                  {dayjs(tx.timestamp).format('DD MMM YYYY, HH:mm')}
+                </p>
+              </div>
+            </div>
+            <div className="text-right">
+              <p className="font-medium" style={{
+                color: tx.type === 'credit' ? colors.success : colors.danger
+              }}>
+                {tx.type === 'credit' ? '+' : '-'}₹{tx.amount.toLocaleString()}
+              </p>
+              <p className="text-sm" style={{
+                color: colors.text + '60',
+                backgroundColor: tx.status === 'pending' ? colors.warning + '20' : colors.success + '20',
+                padding: '2px 8px',
+                borderRadius: '12px',
+                display: 'inline-block'
+              }}>
+                {tx.status}
+              </p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {selectedTransaction && (
+        <TransactionModal
+          transaction={selectedTransaction}
+          onClose={() => setSelectedTransaction(null)}
+        />
+      )}
+
+      <CardDepositModal
+        isOpen={showCardDeposit}
+        onClose={() => setShowCardDeposit(false)}
+        onSuccess={handleDepositSuccess}
+      />
+
+      <TransactionModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        type={modalType}
+        colors={colors}
+      />
+    </div>
   );
 };
 

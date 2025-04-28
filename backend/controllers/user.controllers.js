@@ -6,6 +6,8 @@ import dotenv from "dotenv";
 import { PanCard } from "../models/pan_card.models.js";
 import { Account } from "../models/account.models.js";
 import { Transaction } from "../models/transaction.models.js";
+import sendMail from "../utils/sendEmail.js";
+import sendSMS from "../utils/sendSMS.js";
 dotenv.config();
 
 export async function userRegistration(req, res) {
@@ -124,7 +126,7 @@ export async function userRegistration(req, res) {
 
 export async function userLogin(req, res) {
   try {
-    const { email, role, password } = req.body;
+    const { email, role, password, location } = req.body;
 
     if (!email || !password)
       throw new Error("Email and Password are required.");
@@ -135,22 +137,41 @@ export async function userLogin(req, res) {
     const isPasswordMatched = await comparePassword(password, user.password);
     if (!isPasswordMatched) throw new Error("Invalid credentials.");
 
+    // Update last login location
+    user.lastLoginLocation = location || { latitude: 0, longitude: 0 };
+    await user.save();
+
     const token = jwt.sign(
       { userId: user._id, role: user.role },
       process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: "1d",
-      }
+      { expiresIn: "1d" }
     );
 
-    const {
-      password: _,
-      __v,
-      updatedAt,
-      createdAt,
-      _id,
-      ...safeUserData
-    } = user.toObject();
+    // Get account details if role is user
+    let accountDetails = null;
+    if (role === "user") {
+      accountDetails = await Account.findOne({ user: user._id })
+        .select('balance status accountNumber isPinSet')
+        .lean();
+    }
+
+    const safeUserData = {
+      fullName: user.fullName,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      photoUrl: user.photoUrl,
+      role: user.role,
+      isVerified: user.isVerified,
+      fatherName: user.fatherName,
+      dob: user.dob,
+      lastLoginLocation: user.lastLoginLocation,
+      ...(accountDetails && {
+        balance: accountDetails.balance,
+        accountNumber: accountDetails.accountNumber,
+        status: accountDetails.status,
+        isPinSet: accountDetails.isPinSet
+      })
+    };
 
     res
       .cookie("token", token, {
@@ -367,8 +388,7 @@ export const getDashboardStats = async (req, res) => {
 
 export const getAccountStats = async (req, res) => {
   try {
-    const userId = req.user._id;
-    // First find user's account
+    const userId = req.user.senderId;
     const userAccount = await Account.findOne({ user: userId });
 
     if (!userAccount) {
@@ -418,13 +438,98 @@ export const getAccountStats = async (req, res) => {
   }
 };
 
+export const getTransactions = async (req, res) => {
+  try {
+    const userId = req.user.senderId;
+    const transactions = await Transaction.find({
+      $or: [{ fromUser: userId }, { toUser: userId }]
+    })
+    .sort({ createdAt: -1 })
+    .limit(20)
+    .populate('fromUser toUser', 'fullName')
+    .lean();
+
+    const formattedTransactions = transactions.map(tx => {
+      // Handle cases where fromUser or toUser might be null
+      const fromUserName = tx.fromUser?.fullName || 'Unknown User';
+      const toUserName = tx.toUser?.fullName || 'Unknown User';
+
+      // Determine if current user is sender or receiver
+      const isSender = tx.fromUser?._id?.toString() === userId.toString();
+
+      return {
+        type: isSender ? 'debit' : 'credit',
+        amount: tx.amount || 0,
+        description: tx.remarks ||
+          (isSender ? `Sent to ${toUserName}` : `Received from ${fromUserName}`),
+        timestamp: tx.createdAt,
+        status: tx.status || 'pending',
+        otherParty: isSender ? toUserName : fromUserName,
+        transactionId: tx._id,
+        transactionType: tx.type
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      transactions: formattedTransactions
+    });
+  } catch (error) {
+    console.error('Error fetching transactions:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || 'Failed to fetch transactions'
+    });
+  }
+};
+
 export const sendMoney = async (req, res) => {
   try {
-    const { receiverAccountNumber, amount } = req.body;
-    // Implement transaction logic
-    res.status(200).json({ message: "Money sent successfully" });
+    const { accountNumber, amount, remarks, location } = req.body;
+    const senderId = req.user.senderId;
+
+    // Find sender's and receiver's accounts
+    const senderAccount = await Account.findOne({ user: senderId });
+    const receiverAccount = await Account.findOne({ accountNumber });
+
+    if (!senderAccount || !receiverAccount) {
+      throw new Error('Invalid account details');
+    }
+
+    if (senderAccount.balance < amount) {
+      throw new Error('Insufficient balance');
+    }
+
+    // Create transaction
+    const transaction = await Transaction.create({
+      fromUser: senderId,
+      toUser: receiverAccount.user,
+      amount,
+      type: 'send',
+      status: 'approved',
+      remarks,
+      location: location || { latitude: 0, longitude: 0 }
+    });
+
+    // Update balances
+    senderAccount.balance -= amount;
+    receiverAccount.balance += amount;
+
+    await Promise.all([
+      senderAccount.save(),
+      receiverAccount.save()
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Money sent successfully',
+      transaction: transaction
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 };
 
@@ -435,5 +540,238 @@ export const requestMoney = async (req, res) => {
     res.status(200).json({ message: "Money request sent" });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+};
+
+export const setTransactionPin = async (req, res) => {
+  try {
+    const { pin, confirmPin } = req.body;
+    const userId = req.user.senderId;
+
+    // Find user to get contact details
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    if (!pin || !confirmPin) {
+      throw new Error('PIN and confirmation PIN are required');
+    }
+
+    if (pin !== confirmPin) {
+      throw new Error('PINs do not match');
+    }
+
+    if (pin.length !== 4 || !/^\d+$/.test(pin)) {
+      throw new Error('PIN must be 4 digits');
+    }
+
+    const account = await Account.findOne({ user: userId });
+    if (!account) {
+      throw new Error('Account not found');
+    }
+
+    if (account.isPinSet) {
+      throw new Error('PIN is already set');
+    }
+
+    const hashedPin = await hashedPassword(pin);
+    account.transactionPin = hashedPin;
+    account.isPinSet = true;
+    await account.save();
+
+    // Send notifications
+    await Promise.all([
+      sendMail(
+        user.email,
+        "Transaction PIN Set Successfully",
+        "Security Alert",
+        `<p>Your transaction PIN has been set successfully. If you didn't perform this action, please contact us immediately.</p>`
+      ),
+      sendSMS(
+        user.phoneNumber,
+        `FinFlow Bank: Your transaction PIN has been set successfully. If you didn't perform this action, please contact us immediately.`
+      )
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Transaction PIN set successfully'
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const changeTransactionPin = async (req, res) => {
+  try {
+    const { currentPin, newPin, confirmPin } = req.body;
+    const userId = req.user.senderId;
+
+    if (!currentPin || !newPin || !confirmPin) {
+      throw new Error('All PIN fields are required');
+    }
+
+    if (newPin !== confirmPin) {
+      throw new Error('New PINs do not match');
+    }
+
+    if (newPin.length !== 4 || !/^\d+$/.test(newPin)) {
+      throw new Error('PIN must be 4 digits');
+    }
+
+    const user = await User.findById(userId);
+    const account = await Account.findOne({ user: userId }).select('+transactionPin');
+    if (!account) {
+      throw new Error('Account not found');
+    }
+
+    const isPinValid = await comparePassword(currentPin, account.transactionPin);
+    if (!isPinValid) {
+      throw new Error('Current PIN is incorrect');
+    }
+
+    const hashedPin = await hashedPassword(newPin);
+    account.transactionPin = hashedPin;
+    await account.save();
+
+    // Send notifications
+    await Promise.all([
+      sendMail(
+        user.email,
+        "Transaction PIN Changed Successfully",
+        "Security Alert",
+        `<p>Your transaction PIN has been changed successfully. If you didn't perform this action, please contact us immediately.</p>`
+      ),
+      sendSMS(
+        user.phoneNumber,
+        `FinFlow Bank: Your transaction PIN has been changed successfully. If you didn't perform this action, please contact us immediately.`
+      )
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Transaction PIN changed successfully'
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword, confirmPassword } = req.body;
+    const userId = req.user.senderId;
+
+    if (!currentPassword || !newPassword || !confirmPassword) {
+      throw new Error('All password fields are required');
+    }
+
+    if (newPassword !== confirmPassword) {
+      throw new Error('New passwords do not match');
+    }
+
+    if (newPassword.length < 8) {
+      throw new Error('Password must be at least 8 characters long');
+    }
+
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    const isPasswordValid = await comparePassword(currentPassword, user.password);
+    if (!isPasswordValid) {
+      throw new Error('Current password is incorrect');
+    }
+
+    user.password = await hashedPassword(newPassword);
+    await user.save();
+
+    // Send notifications
+    await Promise.all([
+      sendMail(
+        user.email,
+        "Password Changed Successfully",
+        "Security Alert",
+        `<p>Your account password has been changed successfully. If you didn't perform this action, please contact us immediately.</p>`
+      ),
+      sendSMS(
+        user.phoneNumber,
+        `FinFlow Bank: Your account password has been changed successfully. If you didn't perform this action, please contact us immediately.`
+      )
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password changed successfully'
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const depositMoney = async (req, res) => {
+  try {
+    const { amount, cardInfo } = req.body;
+    const userId = req.user.senderId;
+
+    if (amount < 1) {
+      throw new Error('Minimum deposit amount is ₹1');
+    }
+
+    const account = await Account.findOne({ user: userId });
+    if (!account) {
+      throw new Error('Account not found');
+    }
+
+    // Create transaction record
+    const transaction = await Transaction.create({
+      fromUser: userId,
+      amount,
+      type: 'deposit',
+      status: 'approved',
+      remarks: `Card deposit (${cardInfo.lastFourDigits})`,
+      location: req.body.location || { latitude: 0, longitude: 0 }
+    });
+
+    // Update account balance
+    account.balance += amount;
+    await account.save();
+
+    // Send notification
+    const user = await User.findById(userId);
+    await Promise.all([
+      sendMail(
+        user.email,
+        "Money Added Successfully",
+        "Transaction Alert",
+        `<p>₹${amount} has been added to your account via card (${cardInfo.lastFourDigits})</p>`
+      ),
+      sendSMS(
+        user.phoneNumber,
+        `FinFlow: ₹${amount} credited to your account via card (${cardInfo.lastFourDigits}). Balance: ₹${account.balance}`
+      )
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Money added successfully',
+      transaction
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 };
