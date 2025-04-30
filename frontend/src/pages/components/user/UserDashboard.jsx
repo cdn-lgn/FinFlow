@@ -8,6 +8,7 @@ import dayjs from 'dayjs';
 import SendMoneyModal from '../../../components/SendMoneyModal';
 import RequestMoneyModal from '../../../components/RequestMoneyModal';
 import CardDepositModal from '../../../components/CardDepositModal';
+import { useSelector } from 'react-redux';
 
 const QuickActionCard = ({ icon: Icon, title, description, color, onClick }) => {
   const { colors } = useContext(ThemeContext);
@@ -80,6 +81,7 @@ const UserDashboard = () => {
   const [showSendModal, setShowSendModal] = useState(false);
   const [showRequestModal, setShowRequestModal] = useState(false);
   const [showCardDeposit, setShowCardDeposit] = useState(false);
+  const [alert, setAlert] = useState({ show: false, message: '' });
 
   const fetchAccountStats = async () => {
     try {
@@ -98,6 +100,29 @@ const UserDashboard = () => {
     fetchAccountStats();
   };
 
+  const handleActionClick = (action) => {
+    const user = useSelector(state => state.user.user);
+    if (user.status === 'suspended') {
+      setAlert({
+        show: true,
+        message: 'Your account is suspended. Please contact support.'
+      });
+      return;
+    }
+
+    switch(action) {
+      case 'send':
+        setShowSendModal(true);
+        break;
+      case 'request':
+        setShowRequestModal(true);
+        break;
+      case 'deposit':
+        setShowCardDeposit(true);
+        break;
+    }
+  };
+
   return (
     <div className="p-6 space-y-6">
       <DashboardProfile />
@@ -108,21 +133,21 @@ const UserDashboard = () => {
           title="Send Money"
           description="Transfer to another account"
           color={colors.primary}
-          onClick={() => setShowSendModal(true)}
+          onClick={() => handleActionClick('send')}
         />
         <QuickActionCard
           icon={<FaExchangeAlt />}
           title="Request Money"
           description="Request payment from others"
           color={colors.warning}
-          onClick={() => setShowRequestModal(true)}
+          onClick={() => handleActionClick('request')}
         />
         <QuickActionCard
           icon={<FaCreditCard />}
           title="Add Money"
           description="Deposit via card"
           color={colors.success}
-          onClick={() => setShowCardDeposit(true)}
+          onClick={() => handleActionClick('deposit')}
         />
       </div>
 
@@ -130,6 +155,26 @@ const UserDashboard = () => {
         transactions={accountStats.recentTransactions}
         colors={colors}
       />
+
+      {/* Simple Alert */}
+      {alert.show && (
+        <div
+          className="fixed top-4 right-4 p-4 rounded-lg shadow-lg"
+          style={{
+            backgroundColor: colors.danger + '20',
+            color: colors.danger,
+            border: `1px solid ${colors.danger}`
+          }}
+        >
+          <p>{alert.message}</p>
+          <button
+            onClick={() => setAlert({ show: false, message: '' })}
+            className="absolute top-1 right-1 p-1"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <SendMoneyModal
         isOpen={showSendModal}

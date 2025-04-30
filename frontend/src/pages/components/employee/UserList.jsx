@@ -10,6 +10,9 @@ const UserList = () => {
   const [userPopup, setUserPopup] = useState(false);
   const [selectedUser, setSelectedUser] = useState();
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -39,6 +42,38 @@ const UserList = () => {
       console.error("Error fetching user details:", error);
     }
   };
+
+  const handleStatusChange = async (accountNumber, newStatus) => {
+    try {
+      setIsUpdating(true);
+      const response = await axiosClient.put('/users/account-status', {
+        accountNumber,
+        status: newStatus
+      });
+
+      if (response.data.success) {
+        setUsers(prevUsers =>
+          prevUsers.map(user =>
+            user.accountNumber === accountNumber
+              ? { ...user, accountStatus: newStatus }
+              : user
+          )
+        );
+      }
+    } catch (error) {
+      console.error('Error updating account status:', error);
+    } finally {
+      setIsUpdating(false);
+    }
+  };
+
+  const filteredUsers = users.filter(user => {
+    const matchesSearch = user.accountNumber.includes(searchQuery) ||
+                         user.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                         user.email.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesStatus = statusFilter === 'all' || user.accountStatus === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
 
   const LoadingSkeleton = () => (
     <div className="w-full space-y-4">
@@ -81,6 +116,28 @@ const UserList = () => {
           </div>
         </header>
 
+        {/* Search and Filter Section */}
+        <div className="mb-6 flex flex-wrap gap-4">
+          <input
+            type="text"
+            placeholder="Search by Account Number, Name or Email"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="flex-1 p-2 rounded-lg"
+            style={{ backgroundColor: colors.background, color: colors.text }}
+          />
+          <select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value)}
+            className="p-2 rounded-lg"
+            style={{ backgroundColor: colors.background, color: colors.text }}
+          >
+            <option value="all">All Status</option>
+            <option value="active">Active</option>
+            <option value="suspended">Suspended</option>
+          </select>
+        </div>
+
         {userPopup && <ShowUserDetails
           setUserPopup={setUserPopup}
           selectedUser={selectedUser}
@@ -98,7 +155,7 @@ const UserList = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {users.map((user) => (
+            {filteredUsers.map((user) => (
               <motion.div
                 key={user.email}
                 initial={{ opacity: 0, y: 20 }}
@@ -163,13 +220,23 @@ const UserList = () => {
                 </div>
 
                 <div className="flex items-center gap-2 shrink-0">
+                  <select
+                    value={user.accountStatus}
+                    onChange={(e) => handleStatusChange(user.accountNumber, e.target.value)}
+                    disabled={isUpdating}
+                    className="p-2 rounded-lg text-sm"
+                    style={{
+                      backgroundColor: colors.background,
+                      color: user.accountStatus === 'active' ? colors.success : colors.warning
+                    }}
+                  >
+                    <option value="active">Active</option>
+                    <option value="suspended">Suspended</option>
+                  </select>
                   <button
                     onClick={() => handleView(user)}
-                    className="px-3 py-1.5 rounded text-sm font-medium transition-colors"
-                    style={{
-                      background: colors.gradient,
-                      color: "#fff",
-                    }}
+                    className="px-3 py-1.5 rounded text-sm font-medium"
+                    style={{ background: colors.gradient, color: "#fff" }}
                   >
                     View Details
                   </button>

@@ -6,7 +6,8 @@ import {
   FaUserFriends,
   FaUserCircle,
   FaCogs,
-  FaSignOutAlt
+  FaSignOutAlt,
+  FaUserTie
 } from 'react-icons/fa';
 import { ThemeContext } from '../../context/ThemeContext';
 import { removeUser } from '../../redux/userSlice';
@@ -32,6 +33,7 @@ const Sidebar = ({ role = 'user' }) => {
     admin: [
       { icon: <FaTachometerAlt />, text: 'Dashboard' },
       { icon: <FaUserFriends />, text: 'Manage Users' },
+      { icon: <FaUserTie />, text: 'Employees' },
       { icon: <FaCogs />, text: 'Settings' },
     ],
   };

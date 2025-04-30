@@ -2,8 +2,8 @@ import React, { useContext } from 'react';
 import Sidebar from './components/Sidebar';
 import { ThemeContext } from '../context/ThemeContext';
 import AdminDashboard from './components/admin/AdminDashboard';
-import ManageUsers from './components/admin/ManageUsers';
-import Settings from './components/admin/Settings';
+import UserList from './components/employee/UserList';
+import EmployeeList from './components/admin/EmployeeList';
 
 const Admin = () => {
   const { colors, selectedOption } = useContext(ThemeContext);
@@ -16,8 +16,9 @@ const Admin = () => {
 
       <div className="ml-64 w-full overflow-y-auto">
         {selectedOption === 0 && <AdminDashboard />}
-        {selectedOption === 1 && <ManageUsers />}
-        {selectedOption === 2 && <Settings />}
+        {selectedOption === 1 && <UserList />}
+        {selectedOption === 2 && <EmployeeList />}
+        {selectedOption === 3 && <Settings />}
       </div>
     </div>
   );
