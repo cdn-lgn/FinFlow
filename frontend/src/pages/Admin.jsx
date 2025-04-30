@@ -18,7 +18,6 @@ const Admin = () => {
         {selectedOption === 0 && <AdminDashboard />}
         {selectedOption === 1 && <UserList />}
         {selectedOption === 2 && <EmployeeList />}
-        {selectedOption === 3 && <Settings />}
       </div>
     </div>
   );

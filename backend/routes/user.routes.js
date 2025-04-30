@@ -16,7 +16,8 @@ import {
   changeTransactionPin,
   changePassword,
   depositMoney,
-  handleRequestAction
+  handleRequestAction,
+  updateAccountStatus
 } from "../controllers/user.controllers.js";
 import upload from "../config/multer.js";
 import { authenticateJWT } from "../middleware/authenticateJWT.js";
@@ -48,5 +49,7 @@ userRouter.post("/change-password", authenticateJWT, changePassword);
 
 // New route
 userRouter.post("/request-action", authenticateJWT, handleRequestAction);
+
+userRouter.put("/account-status", authenticateJWT, updateAccountStatus);
 
 export default userRouter;

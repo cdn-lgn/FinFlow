@@ -999,3 +999,49 @@ export const handleRequestAction = async (req, res) => {
     });
   }
 };
+
+export const updateAccountStatus = async (req, res) => {
+  try {
+    const { accountNumber, status } = req.body;
+    const updatedAccount = await Account.findOneAndUpdate(
+      { accountNumber },
+      { status },
+      { new: true }
+    ).populate('user', 'email phoneNumber fullName');
+
+    if (!updatedAccount) {
+      throw new Error('Account not found');
+    }
+
+    // Send notifications
+    await Promise.all([
+      sendMail(
+        updatedAccount.user.email,
+        "Account Status Updated",
+        "Account Alert",
+        `<p>Your account status has been changed to ${status}. ${
+          status === 'suspended'
+            ? 'You cannot perform any transactions until your account is activated.'
+            : 'Your account is now active and you can perform transactions.'
+        }</p>`
+      ),
+      sendSMS(
+        updatedAccount.user.phoneNumber,
+        `FinFlow: Your account is now ${status}. ${
+          status === 'suspended' ? 'Transactions disabled.' : 'Transactions enabled.'
+        }`
+      )
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: `Account ${status} successfully`,
+      account: updatedAccount
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+};

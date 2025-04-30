@@ -5,7 +5,6 @@ import {
   FaTachometerAlt,
   FaUserFriends,
   FaUserCircle,
-  FaCogs,
   FaSignOutAlt,
   FaUserTie
 } from 'react-icons/fa';
@@ -34,7 +33,6 @@ const Sidebar = ({ role = 'user' }) => {
       { icon: <FaTachometerAlt />, text: 'Dashboard' },
       { icon: <FaUserFriends />, text: 'Manage Users' },
       { icon: <FaUserTie />, text: 'Employees' },
-      { icon: <FaCogs />, text: 'Settings' },
     ],
   };
 
