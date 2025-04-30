@@ -21,7 +21,7 @@ const transactionSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: function () {
-      return this.type === "send" || this.type === "receive";
+      return this.type === "send" || this.type === "receive" || this.type === "request";
     },
   },
   amount: {
@@ -31,7 +31,7 @@ const transactionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ["send", "receive", "raiseFund", "deposit", "withdraw"],
+    enum: ["send", "receive", "request", "deposit", "withdraw"],
     required: [true, "Transaction type is required"],
   },
   status: {
@@ -44,7 +44,29 @@ const transactionSchema = new mongoose.Schema({
     trim: true,
     maxlength: [200, "Remarks too long, max 200 characters allowed"],
   },
-  location: locationSchema, // 👈 User's geo-location during transaction
+  location: locationSchema,
+  transactionId: {
+    type: String,
+    unique: true,
+    default: () => `TXN${Date.now()}${Math.floor(Math.random() * 1000)}`,
+  },
+  isRequestor: {
+    type: Boolean,
+    default: false
+  }
 }, { timestamps: true });
+
+// Add this method to help determine if a user is the requestor
+transactionSchema.methods.isUserRequestor = function(userId) {
+  return this.type === 'request' && this.toUser.toString() === userId.toString();
+};
+
+// Ensure transactionId is set
+transactionSchema.pre('save', function(next) {
+  if (!this.transactionId) {
+    this.transactionId = `TXN${Date.now()}${Math.floor(Math.random() * 1000)}`;
+  }
+  next();
+});
 
 export const Transaction = mongoose.model("Transaction", transactionSchema);

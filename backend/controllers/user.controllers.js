@@ -450,13 +450,30 @@ export const getTransactions = async (req, res) => {
     .lean();
 
     const formattedTransactions = transactions.map(tx => {
-      // Handle cases where fromUser or toUser might be null
       const fromUserName = tx.fromUser?.fullName || 'Unknown User';
       const toUserName = tx.toUser?.fullName || 'Unknown User';
-
-      // Determine if current user is sender or receiver
       const isSender = tx.fromUser?._id?.toString() === userId.toString();
 
+      // Special handling for request type transactions
+      if (tx.type === 'request') {
+        const isRequestor = tx.toUser?._id?.toString() === userId.toString();
+        return {
+          type: 'request',
+          amount: tx.amount || 0,
+          description: isRequestor ?
+            `Requested from ${fromUserName}` :
+            `Request from ${toUserName}`,
+          timestamp: tx.createdAt,
+          status: tx.status || 'pending',
+          otherParty: isRequestor ? fromUserName : toUserName,
+          transactionId: tx._id,
+          transactionType: tx.type,
+          isRequestor: isRequestor,
+          remarks: tx.remarks
+        };
+      }
+
+      // Normal transactions
       return {
         type: isSender ? 'debit' : 'credit',
         amount: tx.amount || 0,
@@ -466,7 +483,8 @@ export const getTransactions = async (req, res) => {
         status: tx.status || 'pending',
         otherParty: isSender ? toUserName : fromUserName,
         transactionId: tx._id,
-        transactionType: tx.type
+        transactionType: tx.type,
+        remarks: tx.remarks
       };
     });
 
@@ -485,22 +503,39 @@ export const getTransactions = async (req, res) => {
 
 export const sendMoney = async (req, res) => {
   try {
-    const { accountNumber, amount, remarks, location } = req.body;
+    const { accountNumber, amount, remarks, pin, location } = req.body;
     const senderId = req.user.senderId;
 
-    // Find sender's and receiver's accounts
-    const senderAccount = await Account.findOne({ user: senderId });
+    // Input validation
+    if (!accountNumber || !amount || !pin) {
+      throw new Error('Account number, amount and PIN are required');
+    }
+
+    const senderAccount = await Account.findOne({ user: senderId })
+      .select('+transactionPin');
     const receiverAccount = await Account.findOne({ accountNumber });
 
     if (!senderAccount || !receiverAccount) {
       throw new Error('Invalid account details');
     }
 
+    if (senderAccount.accountNumber === accountNumber) {
+      throw new Error('Cannot send money to your own account');
+    }
+
+    if (!senderAccount.isPinSet) {
+      throw new Error('Please set your transaction PIN first');
+    }
+
+    const isPinValid = await comparePassword(pin, senderAccount.transactionPin);
+    if (!isPinValid) {
+      throw new Error('Invalid transaction PIN');
+    }
+
     if (senderAccount.balance < amount) {
       throw new Error('Insufficient balance');
     }
 
-    // Create transaction
     const transaction = await Transaction.create({
       fromUser: senderId,
       toUser: receiverAccount.user,
@@ -512,18 +547,38 @@ export const sendMoney = async (req, res) => {
     });
 
     // Update balances
-    senderAccount.balance -= amount;
-    receiverAccount.balance += amount;
+    senderAccount.balance -= parseFloat(amount);
+    receiverAccount.balance += parseFloat(amount);
 
     await Promise.all([
       senderAccount.save(),
       receiverAccount.save()
     ]);
 
+    // Send notifications
+    const sender = await User.findById(senderId);
+    const receiver = await User.findById(receiverAccount.user);
+
+    await Promise.all([
+      sendMail(
+        sender.email,
+        "Money Sent Successfully",
+        "Transaction Alert",
+        `<p>₹${amount} has been sent to account ${accountNumber}</p>`
+      ),
+      sendMail(
+        receiver.email,
+        "Money Received",
+        "Transaction Alert",
+        `<p>₹${amount} has been received from ${sender.fullName}</p>`
+      )
+    ]);
+
     res.status(200).json({
       success: true,
       message: 'Money sent successfully',
-      transaction: transaction
+      transaction,
+      newBalance: senderAccount.balance
     });
   } catch (error) {
     res.status(400).json({
@@ -535,11 +590,69 @@ export const sendMoney = async (req, res) => {
 
 export const requestMoney = async (req, res) => {
   try {
-    const { fromAccountNumber, amount } = req.body;
-    // Implement request logic
-    res.status(200).json({ message: "Money request sent" });
+    const { fromAccountNumber, amount, remarks } = req.body;
+    const requestorId = req.user.senderId;
+
+    // Input validation
+    if (!fromAccountNumber || !amount) {
+      throw new Error('Account number and amount are required');
+    }
+
+    const requestorAccount = await Account.findOne({ user: requestorId });
+    const requestedAccount = await Account.findOne({ accountNumber: fromAccountNumber });
+
+    if (!requestedAccount) {
+      throw new Error('Requested account not found');
+    }
+
+    if (requestorAccount.accountNumber === fromAccountNumber) {
+      throw new Error('Cannot request money from your own account');
+    }
+
+    // Create a new pending transaction for the request
+    const transaction = await Transaction.create({
+      fromUser: requestedAccount.user,  // Person who needs to pay
+      toUser: requestorId,              // Person who requested
+      amount: parseFloat(amount),
+      type: 'request',                  // Using the new transaction type
+      status: 'pending',
+      remarks: remarks || 'Money request',
+      location: req.body.location || { latitude: 0, longitude: 0 }
+    });
+
+    // Send notifications
+    const requestedUser = await User.findById(requestedAccount.user);
+    const requestor = await User.findById(requestorId);
+
+    await Promise.all([
+      sendMail(
+        requestedUser.email,
+        "Money Request Received",
+        "Payment Request",
+        `<p>${requestor.fullName} has requested ₹${amount} from you.
+         Account: ${requestorAccount.accountNumber}</p>`
+      ),
+      sendSMS(
+        requestedUser.phoneNumber,
+        `FinFlow: ${requestor.fullName} has requested ₹${amount} from you.`
+      )
+    ]);
+
+    res.status(200).json({
+      success: true,
+      message: 'Money request sent successfully',
+      transaction,
+      requestDetails: {
+        requestedFrom: requestedUser.fullName,
+        amount,
+        status: 'pending'
+      }
+    });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
   }
 };
 
@@ -734,14 +847,16 @@ export const depositMoney = async (req, res) => {
       throw new Error('Account not found');
     }
 
-    // Create transaction record
+    // Create transaction record with unique ID
+    const transactionId = `DEP${Date.now()}${Math.floor(Math.random() * 1000)}`;
     const transaction = await Transaction.create({
       fromUser: userId,
       amount,
       type: 'deposit',
       status: 'approved',
       remarks: `Card deposit (${cardInfo.lastFourDigits})`,
-      location: req.body.location || { latitude: 0, longitude: 0 }
+      location: req.body.location || { latitude: 0, longitude: 0 },
+      transactionId
     });
 
     // Update account balance
@@ -766,7 +881,116 @@ export const depositMoney = async (req, res) => {
     res.status(200).json({
       success: true,
       message: 'Money added successfully',
-      transaction
+      transaction: {
+        ...transaction.toObject(),
+        transactionId
+      },
+      newBalance: account.balance // Add this line to return new balance
+    });
+  } catch (error) {
+    res.status(400).json({
+      success: false,
+      error: error.message
+    });
+  }
+};
+
+export const handleRequestAction = async (req, res) => {
+  try {
+    const { transactionId, action, pin } = req.body;
+    const userId = req.user.senderId;
+
+    if (!transactionId || !action || !pin) {
+      throw new Error('Missing required fields');
+    }
+
+    // Get the request transaction
+    const transaction = await Transaction.findOne({
+      _id: transactionId,
+      type: 'request',
+      status: 'pending',
+      fromUser: userId
+    });
+
+    if (!transaction) {
+      throw new Error('Invalid or expired request');
+    }
+
+    // Verify PIN
+    const account = await Account.findOne({ user: userId })
+      .select('+transactionPin');
+
+    if (!account.isPinSet) {
+      throw new Error('Please set your transaction PIN first');
+    }
+
+    const isPinValid = await comparePassword(pin, account.transactionPin);
+    if (!isPinValid) {
+      throw new Error('Invalid transaction PIN');
+    }
+
+    if (action === 'accept') {
+      // Check balance
+      if (account.balance < transaction.amount) {
+        throw new Error('Insufficient balance');
+      }
+
+      // Get receiver's account
+      const receiverAccount = await Account.findOne({ user: transaction.toUser });
+      if (!receiverAccount) {
+        throw new Error('Receiver account not found');
+      }
+
+      // Update balances
+      account.balance -= transaction.amount;
+      receiverAccount.balance += transaction.amount;
+
+      // Update transaction status
+      transaction.status = 'approved';
+
+      await Promise.all([
+        account.save(),
+        receiverAccount.save(),
+        transaction.save()
+      ]);
+
+      // Send notifications
+      const sender = await User.findById(userId);
+      const receiver = await User.findById(transaction.toUser);
+
+      await Promise.all([
+        sendMail(
+          sender.email,
+          "Payment Request Accepted",
+          "Transaction Alert",
+          `<p>You have sent ₹${transaction.amount} to ${receiver.fullName}</p>`
+        ),
+        sendMail(
+          receiver.email,
+          "Payment Request Completed",
+          "Transaction Alert",
+          `<p>₹${transaction.amount} received from ${sender.fullName}</p>`
+        )
+      ]);
+    } else {
+      // Reject request
+      transaction.status = 'rejected';
+      await transaction.save();
+
+      // Send notification to requestor
+      const receiver = await User.findById(transaction.toUser);
+      await sendMail(
+        receiver.email,
+        "Payment Request Rejected",
+        "Transaction Alert",
+        `<p>Your payment request for ₹${transaction.amount} has been rejected</p>`
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Request ${action}ed successfully`,
+      newBalance: account?.balance
     });
   } catch (error) {
     res.status(400).json({

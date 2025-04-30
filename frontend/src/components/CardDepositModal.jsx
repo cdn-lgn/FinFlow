@@ -4,9 +4,12 @@ import { ThemeContext } from '../context/ThemeContext';
 import { FaCreditCard, FaTimes } from 'react-icons/fa';
 import axiosClient from '../utils/axiosClient';
 import LoadingButton from './LoadingButton';
+import { useDispatch } from 'react-redux';
+import { updateBalance } from '../redux/userSlice';
 
 const CardDepositModal = ({ isOpen, onClose, onSuccess }) => {
   const { colors } = useContext(ThemeContext);
+  const dispatch = useDispatch();
   const [cardDetails, setCardDetails] = useState({
     number: '',
     expiry: '',
@@ -44,6 +47,8 @@ const CardDepositModal = ({ isOpen, onClose, onSuccess }) => {
       });
 
       if (response.data.success) {
+        // Update Redux store with new balance
+        dispatch(updateBalance(response.data.newBalance));
         onSuccess?.();
         onClose();
       }

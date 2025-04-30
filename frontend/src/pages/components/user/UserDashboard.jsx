@@ -5,6 +5,9 @@ import DashboardProfile from '../DashboardProfile';
 import axiosClient from '../../../utils/axiosClient';
 import { FaMoneyBillWave, FaExchangeAlt, FaCreditCard, FaArrowRight } from 'react-icons/fa';
 import dayjs from 'dayjs';
+import SendMoneyModal from '../../../components/SendMoneyModal';
+import RequestMoneyModal from '../../../components/RequestMoneyModal';
+import CardDepositModal from '../../../components/CardDepositModal';
 
 const QuickActionCard = ({ icon: Icon, title, description, color, onClick }) => {
   const { colors } = useContext(ThemeContext);
@@ -74,18 +77,26 @@ const UserDashboard = () => {
     balance: 0,
     recentTransactions: [],
   });
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
+  const [showCardDeposit, setShowCardDeposit] = useState(false);
+
+  const fetchAccountStats = async () => {
+    try {
+      const response = await axiosClient.get('/users/account-stats');  // Changed back to /users/
+      setAccountStats(response.data);
+    } catch (error) {
+      console.error('Error fetching account stats:', error);
+    }
+  };
 
   useEffect(() => {
-    const fetchAccountStats = async () => {
-      try {
-        const response = await axiosClient.get('/users/account-stats');  // Changed back to /users/
-        setAccountStats(response.data);
-      } catch (error) {
-        console.error('Error fetching account stats:', error);
-      }
-    };
     fetchAccountStats();
   }, []);
+
+  const handleTransactionSuccess = () => {
+    fetchAccountStats();
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -97,24 +108,45 @@ const UserDashboard = () => {
           title="Send Money"
           description="Transfer to another account"
           color={colors.primary}
+          onClick={() => setShowSendModal(true)}
         />
         <QuickActionCard
           icon={<FaExchangeAlt />}
           title="Request Money"
           description="Request payment from others"
           color={colors.warning}
+          onClick={() => setShowRequestModal(true)}
         />
         <QuickActionCard
           icon={<FaCreditCard />}
-          title="Cards"
-          description="Manage your cards"
+          title="Add Money"
+          description="Deposit via card"
           color={colors.success}
+          onClick={() => setShowCardDeposit(true)}
         />
       </div>
 
       <RecentTransactions
         transactions={accountStats.recentTransactions}
         colors={colors}
+      />
+
+      <SendMoneyModal
+        isOpen={showSendModal}
+        onClose={() => setShowSendModal(false)}
+        onSuccess={handleTransactionSuccess}
+      />
+
+      <RequestMoneyModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+        onSuccess={handleTransactionSuccess}
+      />
+
+      <CardDepositModal
+        isOpen={showCardDeposit}
+        onClose={() => setShowCardDeposit(false)}
+        onSuccess={handleTransactionSuccess}
       />
     </div>
   );

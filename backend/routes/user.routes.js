@@ -15,7 +15,8 @@ import {
   setTransactionPin,
   changeTransactionPin,
   changePassword,
-  depositMoney
+  depositMoney,
+  handleRequestAction
 } from "../controllers/user.controllers.js";
 import upload from "../config/multer.js";
 import { authenticateJWT } from "../middleware/authenticateJWT.js";
@@ -33,6 +34,8 @@ userRouter.get("/user/:email", authenticateJWT, fetchUserDetails); // Changed fr
 userRouter.get("/dashboard-stats", authenticateJWT, getDashboardStats);
 
 // User specific routes
+userRouter.post("/send", authenticateJWT, sendMoney);
+userRouter.post("/request", authenticateJWT, requestMoney);
 userRouter.post("/send-money", authenticateJWT, sendMoney);
 userRouter.post("/request-money", authenticateJWT, requestMoney);
 userRouter.get('/transactions', authenticateJWT, getTransactions);
@@ -42,5 +45,8 @@ userRouter.post("/deposit", authenticateJWT, depositMoney);
 userRouter.post("/set-pin", authenticateJWT, setTransactionPin);
 userRouter.post("/change-pin", authenticateJWT, changeTransactionPin);
 userRouter.post("/change-password", authenticateJWT, changePassword);
+
+// New route
+userRouter.post("/request-action", authenticateJWT, handleRequestAction);
 
 export default userRouter;

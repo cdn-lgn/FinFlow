@@ -7,6 +7,9 @@ import axiosClient from '../../../utils/axiosClient';
 import dayjs from 'dayjs';
 import TransactionModal from '../../../components/TransactionModal';
 import CardDepositModal from '../../../components/CardDepositModal';
+import SendMoneyModal from '../../../components/SendMoneyModal';
+import RequestMoneyModal from '../../../components/RequestMoneyModal';
+import RequestActionModal from '../../../components/RequestActionModal';
 
 const Transactions = () => {
   const { colors } = useContext(ThemeContext);
@@ -14,6 +17,7 @@ const Transactions = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('send');
   const [selectedTransaction, setSelectedTransaction] = useState(null);
+  const [selectedRequest, setSelectedRequest] = useState(null);
   const [filters, setFilters] = useState({
     type: 'all',
     dateFrom: '',
@@ -21,6 +25,8 @@ const Transactions = () => {
     search: ''
   });
   const [showCardDeposit, setShowCardDeposit] = useState(false);
+  const [showSendModal, setShowSendModal] = useState(false);
+  const [showRequestModal, setShowRequestModal] = useState(false);
 
   useEffect(() => {
     fetchTransactions();
@@ -35,16 +41,35 @@ const Transactions = () => {
     }
   };
 
-  const handleAction = (type) => {
-    setModalType(type);
-    setIsModalOpen(true);
+  const handleTransactionClick = (tx) => {
+    if (tx.type === 'request' && tx.status === 'pending') {
+      setSelectedRequest(tx);
+    } else {
+      setSelectedTransaction(tx);
+    }
   };
 
-  const handleTransactionClick = (tx) => {
-    setSelectedTransaction(tx);
+  const handleTransactionAction = async (transactionId, action) => {
+    try {
+      const response = await axiosClient.post('/users/request-action', {
+        transactionId,
+        action
+      });
+
+      if (response.data.success) {
+        fetchTransactions();
+        setSelectedTransaction(null);
+      }
+    } catch (error) {
+      console.error('Error handling request:', error);
+    }
   };
 
   const handleDepositSuccess = () => {
+    fetchTransactions();
+  };
+
+  const handleTransactionSuccess = () => {
     fetchTransactions();
   };
 
@@ -96,12 +121,12 @@ const Transactions = () => {
       </div>
 
       {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <motion.div
           whileHover={{ scale: 1.02 }}
           className="p-4 rounded-lg cursor-pointer"
           style={{ backgroundColor: colors.card }}
-          onClick={() => handleAction('send')}
+          onClick={() => setShowSendModal(true)}
         >
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-lg" style={{ backgroundColor: colors.primary + '15' }}>
@@ -118,7 +143,7 @@ const Transactions = () => {
           whileHover={{ scale: 1.02 }}
           className="p-4 rounded-lg cursor-pointer"
           style={{ backgroundColor: colors.card }}
-          onClick={() => handleAction('request')}
+          onClick={() => setShowRequestModal(true)}
         >
           <div className="flex items-center gap-4">
             <div className="p-3 rounded-lg" style={{ backgroundColor: colors.warning + '15' }}>
@@ -127,23 +152,6 @@ const Transactions = () => {
             <div>
               <h3 className="font-medium" style={{ color: colors.text }}>Request Money</h3>
               <p className="text-sm" style={{ color: colors.text + '80' }}>Request payment from others</p>
-            </div>
-          </div>
-        </motion.div>
-
-        <motion.div
-          whileHover={{ scale: 1.02 }}
-          className="p-4 rounded-lg cursor-pointer"
-          style={{ backgroundColor: colors.card }}
-          onClick={() => setShowCardDeposit(true)}
-        >
-          <div className="flex items-center gap-4">
-            <div className="p-3 rounded-lg" style={{ backgroundColor: colors.success + '15' }}>
-              <FaCreditCard size={24} style={{ color: colors.success }} />
-            </div>
-            <div>
-              <h3 className="font-medium" style={{ color: colors.text }}>Add Money</h3>
-              <p className="text-sm" style={{ color: colors.text + '80' }}>Deposit via card</p>
             </div>
           </div>
         </motion.div>
@@ -158,8 +166,11 @@ const Transactions = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: index * 0.1 }}
-            className="p-4 border-b last:border-b-0 flex items-center justify-between"
-            style={{ borderColor: colors.border }}
+            className={`p-4 border-b last:border-b-0 flex items-center justify-between cursor-pointer hover:bg-opacity-50`}
+            style={{
+              borderColor: colors.border,
+              backgroundColor: tx.type === 'request' && tx.status === 'pending' ? colors.warning + '10' : 'transparent'
+            }}
           >
             <div className="flex items-center gap-4">
               <div className="p-2 rounded-full" style={{
@@ -179,7 +190,8 @@ const Transactions = () => {
               <p className="font-medium" style={{
                 color: tx.type === 'credit' ? colors.success : colors.danger
               }}>
-                {tx.type === 'credit' ? '+' : '-'}₹{tx.amount.toLocaleString()}
+                {tx.type === 'request' ? '💰 Request' : (tx.type === 'credit' ? '+' : '-')}
+                ₹{tx.amount.toLocaleString()}
               </p>
               <p className="text-sm" style={{
                 color: colors.text + '60',
@@ -195,10 +207,31 @@ const Transactions = () => {
         ))}
       </div>
 
+      <SendMoneyModal
+        isOpen={showSendModal}
+        onClose={() => setShowSendModal(false)}
+        onSuccess={handleTransactionSuccess}
+      />
+
+      <RequestMoneyModal
+        isOpen={showRequestModal}
+        onClose={() => setShowRequestModal(false)}
+        onSuccess={handleTransactionSuccess}
+      />
+
+      {selectedRequest && (
+        <RequestActionModal
+          request={selectedRequest}
+          onClose={() => setSelectedRequest(null)}
+          onSuccess={handleTransactionSuccess}
+        />
+      )}
+
       {selectedTransaction && (
         <TransactionModal
           transaction={selectedTransaction}
           onClose={() => setSelectedTransaction(null)}
+          onAction={handleTransactionAction}
         />
       )}
 

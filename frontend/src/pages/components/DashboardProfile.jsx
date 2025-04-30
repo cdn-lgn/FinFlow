@@ -1,8 +1,10 @@
-import React, { useContext } from "react";
-import { useSelector } from "react-redux";
+import React, { useContext, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
 import { ThemeContext } from "../../context/ThemeContext";
 import { motion } from "framer-motion";
-import { FaCheckCircle, FaTimesCircle, FaMapMarkerAlt } from "react-icons/fa";
+import { FaCheckCircle, FaTimesCircle, FaMapMarkerAlt, FaSync } from "react-icons/fa";
+import { updateBalance } from "../../redux/userSlice";
+import axiosClient from "../../utils/axiosClient";
 
 const DashboardProfile = () => {
   const { colors } = useContext(ThemeContext);
@@ -10,33 +12,62 @@ const DashboardProfile = () => {
 
   if (!user) return <p style={{ color: colors.text }}>Loading...</p>;
 
-  const UserAccountDetails = () => (
-    <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: colors.background + '50' }}>
-      <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primaryDark }}>
-        Account Information
-      </h3>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="p-4 rounded-lg" style={{ backgroundColor: colors.card }}>
-          <p className="text-sm" style={{ color: colors.primary }}>Account Number</p>
-          <p className="text-lg font-semibold">{user.accountNumber || 'N/A'}</p>
-        </div>
-        <div className="p-4 rounded-lg" style={{ backgroundColor: colors.card }}>
-          <p className="text-sm" style={{ color: colors.primary }}>Balance</p>
-          <p className="text-lg font-semibold">₹{user.balance?.toLocaleString() || '0'}</p>
-        </div>
-        <div className="p-4 rounded-lg" style={{ backgroundColor: colors.card }}>
-          <p className="text-sm" style={{ color: colors.primary }}>Account Status</p>
-          <p className="text-lg font-semibold" style={{ color: user.status === 'active' ? colors.success : colors.warning }}>
-            {user.status || 'Inactive'}
-          </p>
-        </div>
-        <div className="p-4 rounded-lg" style={{ backgroundColor: colors.card }}>
-          <p className="text-sm" style={{ color: colors.primary }}>Last Transaction</p>
-          <p className="text-lg font-semibold">{user.lastTransaction || 'No transactions'}</p>
+  const UserAccountDetails = () => {
+    const [isRefreshing, setIsRefreshing] = useState(false);
+    const dispatch = useDispatch();
+
+    const refreshBalance = async () => {
+      setIsRefreshing(true);
+      try {
+        const response = await axiosClient.get('/users/account-stats');
+        if (response.data.success) {
+          dispatch(updateBalance(response.data.balance));
+        }
+      } catch (error) {
+        console.error('Error refreshing balance:', error);
+      } finally {
+        setIsRefreshing(false);
+      }
+    };
+
+    return (
+      <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: colors.background + '50' }}>
+        <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primaryDark }}>
+          Account Information
+        </h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-4 rounded-lg" style={{ backgroundColor: colors.card }}>
+            <p className="text-sm" style={{ color: colors.primary }}>Account Number</p>
+            <p className="text-lg font-semibold">{user.accountNumber || 'N/A'}</p>
+          </div>
+          <div className="p-4 rounded-lg" style={{ backgroundColor: colors.card }}>
+            <div className="flex justify-between items-center">
+              <p className="text-sm" style={{ color: colors.primary }}>Balance</p>
+              <button
+                onClick={refreshBalance}
+                className={`p-2 rounded-full transition-all ${isRefreshing ? 'animate-spin' : 'hover:bg-opacity-10'}`}
+                style={{ backgroundColor: colors.primary + '10' }}
+                disabled={isRefreshing}
+              >
+                <FaSync size={16} style={{ color: colors.primary }} />
+              </button>
+            </div>
+            <p className="text-lg font-semibold">₹{user.balance?.toLocaleString() || '0'}</p>
+          </div>
+          <div className="p-4 rounded-lg" style={{ backgroundColor: colors.card }}>
+            <p className="text-sm" style={{ color: colors.primary }}>Account Status</p>
+            <p className="text-lg font-semibold" style={{ color: user.status === 'active' ? colors.success : colors.warning }}>
+              {user.status || 'Inactive'}
+            </p>
+          </div>
+          <div className="p-4 rounded-lg" style={{ backgroundColor: colors.card }}>
+            <p className="text-sm" style={{ color: colors.primary }}>Last Transaction</p>
+            <p className="text-lg font-semibold">{user.lastTransaction || 'No transactions'}</p>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <motion.div

@@ -1,11 +1,14 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ThemeContext } from '../context/ThemeContext';
-import { FaMoneyBillWave, FaTimes, FaDownload } from 'react-icons/fa';
+import { FaMoneyBillWave, FaTimes, FaDownload, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import dayjs from 'dayjs';
 
-const TransactionModal = ({ transaction, onClose }) => {
+const TransactionModal = ({ transaction, onClose, onAction }) => {
   const { colors } = useContext(ThemeContext);
+  const [pin, setPin] = useState('');
+  const [error, setError] = useState('');
+  const [showPinInput, setShowPinInput] = useState(false);
 
   if (!transaction) {
     return null;
@@ -41,6 +44,28 @@ const TransactionModal = ({ transaction, onClose }) => {
     `);
     printWindow.document.close();
     printWindow.print();
+  };
+
+  const handleActionWithPin = async (action) => {
+    if (!pin) {
+      setError('Please enter PIN');
+      return;
+    }
+    try {
+      await axiosClient.post('/users/request-action', {
+        transactionId: transaction._id,
+        action,
+        pin
+      });
+      onAction?.();
+      onClose();
+    } catch (error) {
+      setError(error.response?.data?.error || 'Action failed');
+    }
+  };
+
+  const handleAction = async (action) => {
+    onAction?.(transaction._id, action);
   };
 
   const txType = transaction?.type || 'debit';
@@ -113,14 +138,109 @@ const TransactionModal = ({ transaction, onClose }) => {
           )}
         </div>
 
-        <button
-          onClick={handlePrint}
-          className="w-full py-3 rounded-lg flex items-center justify-center gap-2"
-          style={{ backgroundColor: colors.primary + '20', color: colors.primary }}
-        >
-          <FaDownload />
-          Download Receipt
-        </button>
+        <div className="space-y-4 mt-6">
+          {transaction.type === 'request' && transaction.status === 'pending' && (
+            showPinInput ? (
+              <div className="space-y-4">
+                <input
+                  type="password"
+                  placeholder="Enter Transaction PIN"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                  maxLength="4"
+                  className="w-full p-3 rounded-lg border"
+                  style={{ backgroundColor: colors.background, color: colors.text }}
+                />
+                {error && (
+                  <p className="text-sm" style={{ color: colors.danger }}>{error}</p>
+                )}
+                <div className="flex gap-4">
+                  <button
+                    onClick={() => setShowPinInput(false)}
+                    className="flex-1 py-3 px-4 rounded-lg"
+                    style={{
+                      backgroundColor: 'transparent',
+                      color: colors.text,
+                      border: `1px solid ${colors.border}`
+                    }}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={() => handleActionWithPin(transaction.actionType)}
+                    className="flex-1 py-3 px-4 rounded-lg"
+                    style={{
+                      backgroundColor: transaction.actionType === 'accept' ? colors.success : colors.danger,
+                      color: 'white'
+                    }}
+                  >
+                    Confirm {transaction.actionType === 'accept' ? 'Accept' : 'Reject'}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="flex gap-4">
+                <button
+                  onClick={() => {
+                    setShowPinInput(true);
+                    transaction.actionType = 'reject';
+                  }}
+                  className="flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: colors.danger + '20',
+                    color: colors.danger,
+                    border: `1px solid ${colors.danger}`
+                  }}
+                >
+                  <FaTimesCircle />
+                  Reject
+                </button>
+                <button
+                  onClick={() => {
+                    setShowPinInput(true);
+                    transaction.actionType = 'accept';
+                  }}
+                  className="flex-1 py-3 px-4 rounded-lg flex items-center justify-center gap-2"
+                  style={{
+                    backgroundColor: colors.success + '20',
+                    color: colors.success,
+                    border: `1px solid ${colors.success}`
+                  }}
+                >
+                  <FaCheckCircle />
+                  Accept
+                </button>
+              </div>
+            )
+          )}
+
+          {transaction.status === 'approved' && (
+            <button
+              onClick={handlePrint}
+              className="w-full py-3 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors hover:opacity-80"
+              style={{
+                backgroundColor: colors.primary,
+                color: 'white',
+                border: `1px solid ${colors.primary}`
+              }}
+            >
+              <FaDownload />
+              Download Receipt
+            </button>
+          )}
+
+          <button
+            onClick={onClose}
+            className="w-full py-3 px-4 rounded-lg flex items-center justify-center gap-2 mt-2"
+            style={{
+              backgroundColor: 'transparent',
+              color: colors.text,
+              border: `1px solid ${colors.border}`
+            }}
+          >
+            Close
+          </button>
+        </div>
       </motion.div>
     </div>
   );
