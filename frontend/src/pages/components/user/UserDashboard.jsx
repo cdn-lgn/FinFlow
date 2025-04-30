@@ -74,6 +74,7 @@ const RecentTransactions = ({ transactions = [], colors }) => (
 
 const UserDashboard = () => {
   const { colors } = useContext(ThemeContext);
+  const user = useSelector(state => state.user.user);  // Move useSelector here
   const [accountStats, setAccountStats] = useState({
     balance: 0,
     recentTransactions: [],
@@ -101,7 +102,6 @@ const UserDashboard = () => {
   };
 
   const handleActionClick = (action) => {
-    const user = useSelector(state => state.user.user);
     if (user.status === 'suspended') {
       setAlert({
         show: true,

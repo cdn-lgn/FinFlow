@@ -34,41 +34,10 @@ export async function userRegistration(req, res) {
     if (password !== confirmPassword)
       throw new Error("Passwords do not match.");
 
-    // Hash password
-    const hsPassword = await hashedPassword(password);
-
-    // Upload profile photo
-    const uploadPhoto = await imageKit.upload({
-      file: req.file.buffer,
-      fileName: `${Date.now()}_${fullName}`,
-      folder: "finflow/userProfile",
-    });
-
-    // Create user object
-    const userData = {
-      fullName: fullName.toLowerCase(),
-      fatherName: fatherName.toLowerCase(),
-      email,
-      phoneNumber: mobile,
-      password: hsPassword,
-      dob,
-      pan,
-      isEmailAndMobileVerified: isEmailAndMobileVerified === "true",
-      address: {
-        addressLine: addressLine.toLowerCase(),
-        city: city.toLowerCase(),
-        country,
-        pincode,
-      },
-      createdLocation: JSON.parse(createdLocation),
-      photoUrl: uploadPhoto.url,
-    };
-
-    const user = await User.create(userData);
-    console.log("✨ User Created:", user);
-
+    // Check PAN verification first
     const panMatch = await PanCard.findOne({ pan_card_id: pan });
 
+    let isPanVerified = false;
     if (panMatch) {
       const toIsoDate = (dateStr) => {
         if (/^\d{2}-\d{2}-\d{4}$/.test(dateStr)) {
@@ -82,39 +51,64 @@ export async function userRegistration(req, res) {
         name: panMatch.full_name?.toLowerCase() === fullName.toLowerCase(),
         dob: dob === toIsoDate(panMatch.dob),
         pan: panMatch.pan_card_id === pan,
-        fatherName:
-          panMatch.fathers_name?.toLowerCase() === fatherName.toLowerCase(),
+        fatherName: panMatch.fathers_name?.toLowerCase() === fatherName.toLowerCase(),
       };
 
-      const allMatch = Object.values(matches).every(Boolean);
-      console.log(Object.values(matches));
+      isPanVerified = Object.values(matches).every(Boolean);
+    }
 
-      if (allMatch) {
-        const userBankAccount = {
-          user: user._id,
-          accountNumber: `${Math.floor(
-            1000000000 + Math.random() * 9000000000
-          )}`,
-          openedAt: new Date(),
-          location: user.createdLocation,
-        };
+    // Hash password and upload photo
+    const hsPassword = await hashedPassword(password);
+    const uploadPhoto = await imageKit.upload({
+      file: req.file.buffer,
+      fileName: `${Date.now()}_${fullName}`,
+      folder: "finflow/userProfile",
+    });
 
-        await Account.create(userBankAccount);
-        console.log("✨ User Bank Account Created:", userBankAccount);
+    // Create user object with verification status
+    const userData = {
+      fullName: fullName.toLowerCase(),
+      fatherName: fatherName.toLowerCase(),
+      email,
+      phoneNumber: mobile,
+      password: hsPassword,
+      dob,
+      pan,
+      isEmailAndMobileVerified: isEmailAndMobileVerified === "true",
+      isVerified: isPanVerified, // Set verification status based on PAN check
+      verifiedByType: isPanVerified ? 'automated' : null,
+      address: {
+        addressLine: addressLine.toLowerCase(),
+        city: city.toLowerCase(),
+        country,
+        pincode,
+      },
+      createdLocation: JSON.parse(createdLocation),
+      photoUrl: uploadPhoto.url,
+    };
 
-        return res.status(200).json({
-          success: true,
-          message: "✅ User and Bank Account Created",
-          account: true,
-        });
-      }
+    const user = await User.create(userData);
+
+    // If PAN verified, create bank account automatically
+    if (isPanVerified) {
+      const userBankAccount = {
+        user: user._id,
+        accountNumber: `${Math.floor(1000000000 + Math.random() * 9000000000)}`,
+        openedAt: new Date(),
+        location: user.createdLocation,
+      };
+
+      await Account.create(userBankAccount);
     }
 
     res.status(200).json({
       success: true,
-      message: "✅ User Registered (No matching PAN card found)",
-      account: false,
+      message: isPanVerified
+        ? "✅ User Verified and Bank Account Created"
+        : "✅ User Registered (Verification Pending)",
+      account: isPanVerified
     });
+
   } catch (error) {
     console.error("❌ Registration Error:", error);
     res.status(400).json({
@@ -517,6 +511,16 @@ export const sendMoney = async (req, res) => {
 
     if (!senderAccount || !receiverAccount) {
       throw new Error('Invalid account details');
+    }
+
+    // Check if sender account is suspended
+    if (senderAccount.status === 'suspended') {
+      throw new Error('Your account is suspended. Cannot perform transactions.');
+    }
+
+    // Check if receiver account is suspended
+    if (receiverAccount.status === 'suspended') {
+      throw new Error('Recipient account is suspended. Cannot send money.');
     }
 
     if (senderAccount.accountNumber === accountNumber) {

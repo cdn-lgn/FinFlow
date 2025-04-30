@@ -7,7 +7,7 @@ import LoadingButton from '../../../components/LoadingButton';
 
 const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
   const { colors } = useContext(ThemeContext);
-  const [formData, setFormData] = useState({
+  const initialFormState = {
     fullName: '',
     fatherName: '',
     email: '',
@@ -19,7 +19,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
     city: '',
     pincode: '',
     country: 'India'
-  });
+  };
+
+  const [formData, setFormData] = useState(initialFormState);
   const [userFace, setUserFace] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,6 +51,10 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
 
       const response = await axiosClient.post('/admin/employees/add', formDataToSend);
       if (response.data.success) {
+        // Reset form
+        setFormData(initialFormState);
+        setUserFace(null);
+        setPreviewUrl(null);
         onSuccess?.();
         onClose();
       }

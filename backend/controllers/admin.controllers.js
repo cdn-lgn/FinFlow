@@ -1,6 +1,9 @@
 import { User } from "../models/user.models.js";
 import { Account } from "../models/account.models.js";
 import { Transaction } from "../models/transaction.models.js";
+import { hashedPassword } from "../utils/bcrypt.js";
+import sendMail from "../utils/sendEmail.js";
+import imageKit from "../config/imagekit.js";
 
 export const getDashboardStats = async (req, res) => {
   try {
@@ -153,6 +156,7 @@ export const getEmployees = async (req, res) => {
 
 export const addEmployee = async (req, res) => {
   try {
+    // Extract form data
     const {
       fullName,
       fatherName,
@@ -164,8 +168,10 @@ export const addEmployee = async (req, res) => {
       addressLine,
       city,
       pincode,
+      country
     } = req.body;
 
+    // Validate required fields
     if (!req.file) {
       throw new Error("Profile photo is required");
     }
@@ -177,49 +183,44 @@ export const addEmployee = async (req, res) => {
       folder: "finflow/employeeProfile",
     });
 
+    // Hash password
+    const hashedPass = await hashedPassword(password);
+
     // Create employee with role='employee'
     const employee = await User.create({
       fullName: fullName.toLowerCase(),
       fatherName: fatherName.toLowerCase(),
       email,
       phoneNumber: mobile,
-      password: await hashedPassword(password),
+      password: hashedPass,
       dob,
       pan,
       role: 'employee',
       photoUrl: uploadPhoto.url,
       isVerified: true, // Employees are verified by default
+      isEmailAndMobileVerified: true, // Set email and mobile as verified
       address: {
         addressLine: addressLine.toLowerCase(),
         city: city.toLowerCase(),
-        country: 'India',
+        country,
         pincode,
       }
     });
-
-    // Send welcome email
-    await sendMail(
-      email,
-      "Welcome to FinFlow Bank",
-      "Employee Account Created",
-      `<p>Your employee account has been created successfully. Login credentials:<br>
-       Email: ${email}<br>
-       Password: ${password}</p>`
-    );
 
     res.status(201).json({
       success: true,
       message: 'Employee added successfully',
       employee: {
-        fullName: employee.fullName,
         email: employee.email,
-        role: employee.role
+        fullName: employee.fullName
       }
     });
+
   } catch (error) {
+    console.error('Error adding employee:', error);
     res.status(400).json({
       success: false,
-      error: error.message
+      error: error.message || 'Failed to add employee'
     });
   }
 };
@@ -258,6 +259,54 @@ export const getEmployeeDetails = async (req, res) => {
     res.status(400).json({
       success: false,
       error: error.message
+    });
+  }
+};
+
+export const removeEmployee = async (req, res) => {
+  try {
+    const { employeeId } = req.params;
+
+    // Check if employee exists and is actually an employee
+    const employee = await User.findOne({
+      _id: employeeId,
+      role: 'employee'
+    });
+
+    if (!employee) {
+      throw new Error('Employee not found');
+    }
+
+    // Get pending verifications count
+    const pendingVerifications = await User.countDocuments({
+      verifiedBy: employeeId,
+      isVerified: false
+    });
+
+    if (pendingVerifications > 0) {
+      throw new Error('Cannot remove employee with pending verifications');
+    }
+
+    // Send email notification to employee
+    await sendMail(
+      employee.email,
+      "Account Access Revoked",
+      "Employment Status",
+      `<p>Your employee account access has been revoked. For any queries, please contact the administrator.</p>`
+    );
+
+    // Remove the employee
+    await User.deleteOne({ _id: employeeId });
+
+    res.status(200).json({
+      success: true,
+      message: 'Employee removed successfully'
+    });
+  } catch (error) {
+    console.error('Error removing employee:', error);
+    res.status(400).json({
+      success: false,
+      error: error.message || 'Failed to remove employee'
     });
   }
 };

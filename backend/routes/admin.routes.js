@@ -9,8 +9,10 @@ import {
   updateSystemSettings,
   getEmployees,
   addEmployee,
-  getEmployeeDetails
+  getEmployeeDetails,
+  removeEmployee
 } from "../controllers/admin.controllers.js";
+import upload from "../config/multer.js";
 
 const adminRouter = Router();
 
@@ -27,8 +29,9 @@ adminRouter.put("/user/role", updateUserRole);
 
 // Add new route for employees
 adminRouter.get("/employees", getEmployees);
-adminRouter.post("/employees/add", addEmployee);
+adminRouter.post("/employees/add", upload.single("image"), addEmployee);
 adminRouter.get("/employees/:employeeId", getEmployeeDetails);
+adminRouter.delete("/employees/:employeeId", removeEmployee);
 
 // System settings
 adminRouter.put("/settings", updateSystemSettings);

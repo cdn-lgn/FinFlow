@@ -37,17 +37,17 @@ export default function App() {
           <Route
             path="/login"
             element={
-              // <PublicRoute>
+              <PublicRoute>
                 <Login />
-              // </PublicRoute>
+              </PublicRoute>
             }
           />
           <Route
             path="/register"
             element={
-              // <PublicRoute>
+              <PublicRoute>
                 <Signup />
-              // </PublicRoute>
+              </PublicRoute>
             }
           />
           <Route path="/verify" element={<VerificationResult/>} />

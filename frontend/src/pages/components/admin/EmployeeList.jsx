@@ -2,8 +2,9 @@ import React, { useContext, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ThemeContext } from '../../../context/ThemeContext';
 import axiosClient from '../../../utils/axiosClient';
-import { FaUserTie, FaUserCog, FaEye, FaTimes } from 'react-icons/fa';
+import { FaUserTie, FaUserCog, FaEye, FaTrash, FaTimes } from 'react-icons/fa';
 import AddEmployeeModal from './AddEmployeeModal';
+import LoadingButton from '../../../components/LoadingButton';
 
 const EmployeeList = () => {
   const { colors } = useContext(ThemeContext);
@@ -11,6 +12,9 @@ const EmployeeList = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedEmployee, setSelectedEmployee] = useState(null);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState(null);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     const fetchEmployees = async () => {
@@ -39,6 +43,30 @@ const EmployeeList = () => {
       }
     } catch (error) {
       console.error('Error fetching employee details:', error);
+    }
+  };
+
+  const handleRemoveClick = (employeeId) => {
+    setSelectedEmployeeId(employeeId);
+    setShowConfirmModal(true);
+  };
+
+  const handleRemoveEmployee = async () => {
+    try {
+      setIsDeleting(true);
+      const response = await axiosClient.delete(`/admin/employees/${selectedEmployeeId}`);
+
+      if (response.data.success) {
+        setEmployees(prev => prev.filter(emp => emp._id !== selectedEmployeeId));
+        setShowConfirmModal(false);
+        setSelectedEmployeeId(null);
+      }
+    } catch (error) {
+      console.error('Error removing employee:', error);
+      // Show error message
+      alert(error.response?.data?.error || 'Failed to remove employee');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -110,13 +138,22 @@ const EmployeeList = () => {
                       </p>
                     </div>
                   </div>
-                  <button
-                    onClick={() => handleViewDetails(employee._id)}
-                    className="p-2 rounded-lg"
-                    style={{ backgroundColor: colors.primary + '20', color: colors.primary }}
-                  >
-                    <FaEye />
-                  </button>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      onClick={() => handleViewDetails(employee._id)}
+                      className="p-2 rounded-lg"
+                      style={{ backgroundColor: colors.primary + '20', color: colors.primary }}
+                    >
+                      <FaEye />
+                    </button>
+                    <button
+                      onClick={() => handleRemoveClick(employee._id)}
+                      className="p-2 rounded-lg"
+                      style={{ backgroundColor: colors.danger + '20', color: colors.danger }}
+                    >
+                      <FaTrash />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             ))}
@@ -224,6 +261,51 @@ const EmployeeList = () => {
                   </p>
                 )}
               </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <motion.div
+            initial={{ scale: 0.95, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            className="w-full max-w-md p-6 rounded-xl relative"
+            style={{ backgroundColor: colors.card }}
+          >
+            <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primaryDark }}>
+              Remove Employee
+            </h3>
+            <p style={{ color: colors.text }}>
+              Are you sure you want to remove this employee? This action cannot be undone.
+            </p>
+            <div className="flex justify-end gap-4 mt-6">
+              <button
+                onClick={() => setShowConfirmModal(false)}
+                disabled={isDeleting}
+                className="px-4 py-2 rounded-lg"
+                style={{
+                  backgroundColor: colors.background,
+                  color: colors.text,
+                  opacity: isDeleting ? 0.7 : 1
+                }}
+              >
+                Cancel
+              </button>
+              <LoadingButton
+                onClick={() => handleRemoveEmployee(selectedEmployeeId)}
+                isLoading={isDeleting}
+                className="px-4 py-2 rounded-lg text-white"
+                style={{
+                  backgroundColor: colors.danger,
+                  opacity: isDeleting ? 0.7 : 1
+                }}
+                loadingText="Removing..."
+              >
+                Remove
+              </LoadingButton>
             </div>
           </motion.div>
         </div>
