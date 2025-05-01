@@ -10,7 +10,7 @@ import {
   getEmployees,
   addEmployee,
   getEmployeeDetails,
-  removeEmployee
+  removeEmployee,
 } from "../controllers/admin.controllers.js";
 import upload from "../config/multer.js";
 
@@ -32,8 +32,5 @@ adminRouter.get("/employees", getEmployees);
 adminRouter.post("/employees/add", upload.single("image"), addEmployee);
 adminRouter.get("/employees/:employeeId", getEmployeeDetails);
 adminRouter.delete("/employees/:employeeId", removeEmployee);
-
-// System settings
-adminRouter.put("/settings", updateSystemSettings);
 
 export default adminRouter;

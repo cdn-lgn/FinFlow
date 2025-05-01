@@ -2,7 +2,7 @@ import sgMail from "@sendgrid/mail";
 import dotenv from "dotenv";
 dotenv.config();
 
-sgMail.setApiKey(process.env.SENDGRID_API_KEY || "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");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 async function sendMail(to, subject, text, html) {
   const msg = {
@@ -20,7 +20,6 @@ async function sendMail(to, subject, text, html) {
     console.error("❌ Error sending email:", error?.response?.body || error);
   }
 }
-
 
 // const run = async () => {
 //   await sendMail(
