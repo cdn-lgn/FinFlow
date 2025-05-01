@@ -4,9 +4,6 @@
   <img src="./screenshots/logo-transparent.png" alt="FinFlow Logo" width="200"/>
 
   [Live Demo](https://finflow-bank.vercel.app)
-
-  ![GitHub last commit](https://img.shields.io/github/last-commit/cdn-lgn/FinFlow_private)
-  ![License](https://img.shields.io/badge/license-MIT-blue)
 </div>
 
 ## ✨ Key Features
