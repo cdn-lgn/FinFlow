@@ -3,7 +3,7 @@
 <div align="center">
   <img src="./screenshots/logo-transparent.png" alt="FinFlow Logo" width="200"/>
 
-  [Live Demo](https://finflow-bank.vercel.app)
+  [Live Demo](https://fin-flow-private.vercel.app/)
 </div>
 
 ## ✨ Key Features
