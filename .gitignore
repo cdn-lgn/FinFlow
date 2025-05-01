@@ -4,6 +4,7 @@
 # Ignore env files everywhere
 **/.env
 
+
 # Ignore build output
 **/dist/
 **/build/
