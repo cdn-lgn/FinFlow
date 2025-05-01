@@ -35,15 +35,13 @@
   <img src="https://raw.githubusercontent.com/teamedwardforever/Readme-Generator/71f25dd8b98329b168142a6b782a107b75eab178/svg/Skills/Frontend/tailwindcss-icon.svg" width="40" height="40" alt="TailwindCSS"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg" width="40" height="40" alt="Redux"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="40" height="40" alt="JavaScript"/>
-  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" width="40" height="40" alt="TypeScript"/>
   <img src="https://user-images.githubusercontent.com/7850794/164965523-3eced4c4-6020-467e-acde-f11b7900ad62.png" width="40" height="40" alt="Framer Motion"/>
 </p>
 
-- React 18 with TypeScript
-- Redux Toolkit + RTK Query
-- TailwindCSS + Framer Motion
+- Redux Toolkit State Managment
+- TailwindCSS for Styling
+- Framer Motion for Animations
 - Face-api.js for face detection
-- React-to-PDF for receipts
 
 ### Backend
 <p align="center">
