@@ -27,6 +27,8 @@
   - Request money feature
   - Transaction PIN security
   - Real-time balance updates
+  - Transaction receipt generation
+  - Download statement feature
 
 - **Security Measures**
   - PAN card verification
@@ -41,6 +43,10 @@
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="40" height="40"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" width="40" height="40"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jest/jest-plain.svg" width="40" height="40"/>
 </p>
 
 - React.js (Frontend framework)
@@ -48,23 +54,41 @@
 - Redux Toolkit (State management)
 - Framer Motion (Animations)
 - Axios (API calls)
+- React Router (Navigation)
+- PDF Generator (Receipts & Statements)
 
 ### Backend
 <p align="center">
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="40" height="40"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="40" height="40"/>
   <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="40" height="40"/>
 </p>
 
 - Node.js & Express.js (Server)
 - MongoDB (Database)
 - JWT (Authentication)
 - Bcrypt (Encryption)
+- Mongoose (ODM)
+- Docker (Containerization)
+- Nginx (Reverse Proxy)
 
-### External Services
-- Face-api.js (Face detection)
-- SendGrid (Email service)
-- TextLink SMS (SMS service)
+### Cloud Services & Tools
+<p align="center">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" width="40" height="40"/>
+</p>
+
+- AWS (Hosting)
+- ImageKit (File Storage)
+- Face-api.js (Face Detection)
+- SendGrid (Email Service)
+- TextLink SMS (SMS Service)
+- Git (Version Control)
+- PM2 (Process Management)
 
 ## 📸 Screenshots
 
@@ -74,36 +98,6 @@
   <img src="./screenshots/transfer.png" alt="Transfer Money" width="400"/>
   <img src="./screenshots/verification.png" alt="Verification" width="400"/>
 </div>
-
-## 🔧 Core Features Implementation
-
-```javascript
-// User Authentication with Face Detection
-const handleFaceVerification = async (image) => {
-  const detections = await faceapi.detectAllFaces(image);
-  return detections.length === 1;
-};
-
-// Secure Transaction System
-const handleMoneyTransfer = async (amount, recipient, pin) => {
-  const location = await getLocation();
-  return await api.post('/transfer', {
-    amount,
-    recipient,
-    pin,
-    location
-  });
-};
-
-// Employee Verification System
-const verifyUserAccount = async (userId, panDetails) => {
-  const verification = await automaticPanVerification(panDetails);
-  if (!verification.success) {
-    return manualEmployeeVerification(userId);
-  }
-  return verification;
-};
-```
 
 ## 🚀 Getting Started
 
@@ -141,12 +135,6 @@ npm run dev
 cd frontend
 npm start
 ```
-
-## 📱 Mobile View
-<div align="center">
-  <img src="./screenshots/mobile-login.png" width="200"/>
-  <img src="./screenshots/mobile-dashboard.png" width="200"/>
-</div>
 
 ## 📄 License
 
