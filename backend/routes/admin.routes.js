@@ -6,7 +6,6 @@ import {
   getAllUsers,
   updateUserRole,
   getSystemStats,
-  updateSystemSettings,
   getEmployees,
   addEmployee,
   getEmployeeDetails,

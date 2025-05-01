@@ -8,45 +8,46 @@ import imageKit from "../config/imagekit.js";
 export const getDashboardStats = async (req, res) => {
   try {
     // Get total users count
-    const totalUsers = await User.countDocuments({ role: 'user' });
+    const totalUsers = await User.countDocuments({ role: "user" });
 
     // Get active users count
-    const activeUsers = await Account.countDocuments({ status: 'active' });
+    const activeUsers = await Account.countDocuments({ status: "active" });
 
     // Get employee count
-    const employeeCount = await User.countDocuments({ role: 'employee' });
+    const employeeCount = await User.countDocuments({ role: "employee" });
 
     // Get pending issues/requests count
     const pendingIssues = await Transaction.countDocuments({
-      type: 'request',
-      status: 'pending'
+      type: "request",
+      status: "pending",
     });
 
     // Get recent transactions
     const recentTransactions = await Transaction.find()
       .sort({ createdAt: -1 })
       .limit(5)
-      .populate('fromUser toUser', 'fullName')
+      .populate("fromUser toUser", "fullName")
       .lean()
-      .then(transactions => transactions.map(tx => ({
-        type: tx.type,
-        amount: tx.amount,
-        description: tx.remarks || `${tx.type} transaction`,
-        timestamp: tx.createdAt,
-        performedBy: tx.fromUser?.fullName || 'Unknown',
-        recipient: tx.toUser?.fullName || 'Unknown'
-      })));
+      .then((transactions) =>
+        transactions.map((tx) => ({
+          type: tx.type,
+          amount: tx.amount,
+          description: tx.remarks || `${tx.type} transaction`,
+          timestamp: tx.createdAt,
+          performedBy: tx.fromUser?.fullName || "Unknown",
+          recipient: tx.toUser?.fullName || "Unknown",
+        })),
+      );
 
     res.status(200).json({
       totalUsers,
       activeUsers,
       employeeCount,
       pendingIssues,
-      recentTransactions // Send transactions as activities
+      recentTransactions, // Send transactions as activities
     });
-
   } catch (error) {
-    console.error('Error fetching dashboard stats:', error);
+    console.error("Error fetching dashboard stats:", error);
     res.status(500).json({ error: error.message });
   }
 };
@@ -54,10 +55,10 @@ export const getDashboardStats = async (req, res) => {
 export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find()
-      .select('-password')
+      .select("-password")
       .populate({
-        path: 'account',
-        select: 'balance status accountNumber'
+        path: "account",
+        select: "balance status accountNumber",
       })
       .lean();
 
@@ -71,18 +72,18 @@ export const updateUserRole = async (req, res) => {
   try {
     const { userId, role } = req.body;
 
-    if (!['user', 'employee'].includes(role)) {
-      throw new Error('Invalid role');
+    if (!["user", "employee"].includes(role)) {
+      throw new Error("Invalid role");
     }
 
     const user = await User.findByIdAndUpdate(
       userId,
       { role },
-      { new: true }
-    ).select('-password');
+      { new: true },
+    ).select("-password");
 
     if (!user) {
-      throw new Error('User not found');
+      throw new Error("User not found");
     }
 
     res.status(200).json({ user });
@@ -96,19 +97,19 @@ export const getSystemStats = async (req, res) => {
     const stats = {
       transactions: {
         total: await Transaction.countDocuments(),
-        pending: await Transaction.countDocuments({ status: 'pending' }),
-        completed: await Transaction.countDocuments({ status: 'approved' })
+        pending: await Transaction.countDocuments({ status: "pending" }),
+        completed: await Transaction.countDocuments({ status: "approved" }),
       },
       users: {
         total: await User.countDocuments(),
         verified: await User.countDocuments({ isVerified: true }),
-        unverified: await User.countDocuments({ isVerified: false })
+        unverified: await User.countDocuments({ isVerified: false }),
       },
       accounts: {
         total: await Account.countDocuments(),
-        active: await Account.countDocuments({ status: 'active' }),
-        suspended: await Account.countDocuments({ status: 'suspended' })
-      }
+        active: await Account.countDocuments({ status: "active" }),
+        suspended: await Account.countDocuments({ status: "suspended" }),
+      },
     };
 
     res.status(200).json(stats);
@@ -117,37 +118,30 @@ export const getSystemStats = async (req, res) => {
   }
 };
 
-export const updateSystemSettings = async (req, res) => {
-  // For future implementation
-  // Things like:
-  // - Transaction limits
-  // - System maintenance mode
-  // - Notification settings
-  res.status(501).json({ message: 'Not implemented yet' });
-};
-
 export const getEmployees = async (req, res) => {
   try {
-    const employees = await User.find({ role: 'employee' })
-      .select('fullName email phoneNumber photoUrl isVerified createdAt')
+    const employees = await User.find({ role: "employee" })
+      .select("fullName email phoneNumber photoUrl isVerified createdAt")
       .lean();
 
-    const employeesWithStats = await Promise.all(employees.map(async (emp) => {
-      const verificationCount = await User.countDocuments({
-        verifiedBy: emp._id,
-        isVerified: true
-      });
+    const employeesWithStats = await Promise.all(
+      employees.map(async (emp) => {
+        const verificationCount = await User.countDocuments({
+          verifiedBy: emp._id,
+          isVerified: true,
+        });
 
-      return {
-        ...emp,
-        verificationCount,
-        status: 'active'
-      };
-    }));
+        return {
+          ...emp,
+          verificationCount,
+          status: "active",
+        };
+      }),
+    );
 
     res.status(200).json({
       success: true,
-      employees: employeesWithStats
+      employees: employeesWithStats,
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -168,7 +162,7 @@ export const addEmployee = async (req, res) => {
       addressLine,
       city,
       pincode,
-      country
+      country,
     } = req.body;
 
     // Validate required fields
@@ -195,7 +189,7 @@ export const addEmployee = async (req, res) => {
       password: hashedPass,
       dob,
       pan,
-      role: 'employee',
+      role: "employee",
       photoUrl: uploadPhoto.url,
       isVerified: true, // Employees are verified by default
       isEmailAndMobileVerified: true, // Set email and mobile as verified
@@ -204,23 +198,22 @@ export const addEmployee = async (req, res) => {
         city: city.toLowerCase(),
         country,
         pincode,
-      }
+      },
     });
 
     res.status(201).json({
       success: true,
-      message: 'Employee added successfully',
+      message: "Employee added successfully",
       employee: {
         email: employee.email,
-        fullName: employee.fullName
-      }
+        fullName: employee.fullName,
+      },
     });
-
   } catch (error) {
-    console.error('Error adding employee:', error);
+    console.error("Error adding employee:", error);
     res.status(400).json({
       success: false,
-      error: error.message || 'Failed to add employee'
+      error: error.message || "Failed to add employee",
     });
   }
 };
@@ -229,21 +222,19 @@ export const getEmployeeDetails = async (req, res) => {
   try {
     const { employeeId } = req.params;
 
-    const employee = await User.findById(employeeId)
-      .select('-password')
-      .lean();
+    const employee = await User.findById(employeeId).select("-password").lean();
 
     if (!employee) {
-      throw new Error('Employee not found');
+      throw new Error("Employee not found");
     }
 
     // Get verification stats
     const verifiedUsers = await User.find({
       verifiedBy: employeeId,
-      isVerified: true
+      isVerified: true,
     })
-    .select('fullName email createdAt')
-    .lean();
+      .select("fullName email createdAt")
+      .lean();
 
     res.status(200).json({
       success: true,
@@ -251,14 +242,14 @@ export const getEmployeeDetails = async (req, res) => {
         ...employee,
         stats: {
           totalVerifications: verifiedUsers.length,
-          recentVerifications: verifiedUsers.slice(0, 5)
-        }
-      }
+          recentVerifications: verifiedUsers.slice(0, 5),
+        },
+      },
     });
   } catch (error) {
     res.status(400).json({
       success: false,
-      error: error.message
+      error: error.message,
     });
   }
 };
@@ -270,21 +261,21 @@ export const removeEmployee = async (req, res) => {
     // Check if employee exists and is actually an employee
     const employee = await User.findOne({
       _id: employeeId,
-      role: 'employee'
+      role: "employee",
     });
 
     if (!employee) {
-      throw new Error('Employee not found');
+      throw new Error("Employee not found");
     }
 
     // Get pending verifications count
     const pendingVerifications = await User.countDocuments({
       verifiedBy: employeeId,
-      isVerified: false
+      isVerified: false,
     });
 
     if (pendingVerifications > 0) {
-      throw new Error('Cannot remove employee with pending verifications');
+      throw new Error("Cannot remove employee with pending verifications");
     }
 
     // Send email notification to employee
@@ -292,7 +283,7 @@ export const removeEmployee = async (req, res) => {
       employee.email,
       "Account Access Revoked",
       "Employment Status",
-      `<p>Your employee account access has been revoked. For any queries, please contact the administrator.</p>`
+      `<p>Your employee account access has been revoked. For any queries, please contact the administrator.</p>`,
     );
 
     // Remove the employee
@@ -300,13 +291,13 @@ export const removeEmployee = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Employee removed successfully'
+      message: "Employee removed successfully",
     });
   } catch (error) {
-    console.error('Error removing employee:', error);
+    console.error("Error removing employee:", error);
     res.status(400).json({
       success: false,
-      error: error.message || 'Failed to remove employee'
+      error: error.message || "Failed to remove employee",
     });
   }
 };
