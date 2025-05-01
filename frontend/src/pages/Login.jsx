@@ -1,12 +1,12 @@
-import React, { useContext, useState } from 'react';
-import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { ThemeContext } from '../context/ThemeContext';
-import axiosClient from '../utils/axiosClient';
-import { useDispatch, useSelector } from 'react-redux';
-import { setUser } from '../redux/userSlice';
-import { useNavigate } from 'react-router-dom';
-import LoadingButton from './components/LoadingButton';
-import getLocation from '../utils/getLocation';
+import React, { useContext, useState } from "react";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import { ThemeContext } from "../context/ThemeContext";
+import axiosClient from "../utils/axiosClient";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/userSlice";
+import { useNavigate } from "react-router-dom";
+import LoadingButton from "./components/LoadingButton";
+import getLocation from "../utils/getLocation";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -14,39 +14,45 @@ const Login = () => {
 
   const { colors } = useContext(ThemeContext);
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState('user');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [role, setRole] = useState("user");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleClickShowPassword = () => setShowPassword(!showPassword);
   const handleRoleChange = (e) => setRole(e.target.value);
 
   const handleLogin = async () => {
-    setError('');
+    setError("");
     setIsLoading(true);
     try {
       const location = await getLocation();
-      const res = await axiosClient.post(
-        '/user/login',
-        { email, password, role, location }
-      );
+      const res = await axiosClient.post("/user/login", {
+        email,
+        password,
+        role,
+        location,
+      });
 
-      if(res.data?.userData?.fullName) {
+      if (res.data?.userData?.fullName) {
         dispatch(setUser(res.data.userData));
         navigate(`/${role}`);
       }
     } catch (err) {
-      console.error('❌ Login error:', err);
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      console.error("❌ Login error:", err);
+      setError(
+        err.response?.data?.message || "Login failed. Please try again.",
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className={`h-screen w-screen flex items-center justify-center bg-${colors.background} text-${colors.text}`}>
+    <div
+      className={`h-screen w-screen flex items-center justify-center bg-${colors.background} text-${colors.text}`}
+    >
       <div className={`p-8 rounded-3xl w-full max-w-sm bg-${colors.card}`}>
         {/* Logo */}
         <div className="text-center mb-8">
@@ -57,7 +63,9 @@ const Login = () => {
 
         {/* Email */}
         <div className="mb-4">
-          <label htmlFor="email" className="block text-sm mb-1">Email</label>
+          <label htmlFor="email" className="block text-sm mb-1">
+            Email
+          </label>
           <input
             id="email"
             type="email"
@@ -70,11 +78,13 @@ const Login = () => {
 
         {/* Password */}
         <div className="mb-4">
-          <label htmlFor="password" className="block text-sm mb-1">Password</label>
+          <label htmlFor="password" className="block text-sm mb-1">
+            Password
+          </label>
           <div className="relative">
             <input
               id="password"
-              type={showPassword ? 'text' : 'password'}
+              type={showPassword ? "text" : "password"}
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -95,7 +105,9 @@ const Login = () => {
 
         {/* Role Selector */}
         <div className="mb-4">
-          <label htmlFor="role" className="block text-sm mb-1">Select Role</label>
+          <label htmlFor="role" className="block text-sm mb-1">
+            Select Role
+          </label>
           <select
             id="role"
             value={role}
@@ -126,9 +138,16 @@ const Login = () => {
         </LoadingButton>
 
         {/* Footer Actions */}
-        <div className={`mt-4 flex justify-between text-sm text-${colors.text}`}>
+        <div
+          className={`mt-4 flex justify-between text-sm text-${colors.text}`}
+        >
           <span className="cursor-pointer">Forgot Password?</span>
-          <span className="cursor-pointer" onClick={()=>navigate("/register")}>Create Account</span>
+          <span
+            className="cursor-pointer"
+            onClick={() => navigate("/register")}
+          >
+            Create Account
+          </span>
         </div>
       </div>
     </div>

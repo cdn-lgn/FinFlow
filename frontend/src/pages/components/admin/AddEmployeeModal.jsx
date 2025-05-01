@@ -1,55 +1,60 @@
-import React, { useState, useContext } from 'react';
-import { motion } from 'framer-motion';
-import { ThemeContext } from '../../../context/ThemeContext';
-import { FaTimes, FaCamera } from 'react-icons/fa';
-import axiosClient from '../../../utils/axiosClient';
-import LoadingButton from '../LoadingButton';
+import React, { useState, useContext } from "react";
+import { motion } from "framer-motion";
+import { ThemeContext } from "../../../context/ThemeContext";
+import { FaTimes, FaCamera } from "react-icons/fa";
+import axiosClient from "../../../utils/axiosClient";
+import LoadingButton from "../LoadingButton";
 
 const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
   const { colors } = useContext(ThemeContext);
   const initialFormState = {
-    fullName: '',
-    fatherName: '',
-    email: '',
-    mobile: '',
-    password: '',
-    dob: '',
-    pan: '',
-    addressLine: '',
-    city: '',
-    pincode: '',
-    country: 'India'
+    fullName: "",
+    fatherName: "",
+    email: "",
+    mobile: "",
+    password: "",
+    dob: "",
+    pan: "",
+    addressLine: "",
+    city: "",
+    pincode: "",
+    country: "India",
   };
 
   const [formData, setFormData] = useState(initialFormState);
   const [userFace, setUserFace] = useState(null);
   const [previewUrl, setPreviewUrl] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleCapture = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && ["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
       setUserFace(file);
       setPreviewUrl(URL.createObjectURL(file));
+    } else {
+      setError("Please upload a valid image file (JPEG, PNG, GIF).");
     }
   };
 
   const handleSubmit = async () => {
-    setError('');
+    setError("");
     setIsLoading(true);
 
     try {
       const formDataToSend = new FormData();
-      Object.keys(formData).forEach(key => {
+      Object.keys(formData).forEach((key) => {
         formDataToSend.append(key, formData[key]);
       });
 
       if (userFace) {
-        formDataToSend.append('image', userFace);
+        formDataToSend.append("image", userFace);
       }
 
-      const response = await axiosClient.post('/admin/employees/add', formDataToSend);
+      const response = await axiosClient.post(
+        "/admin/employees/add",
+        formDataToSend,
+      );
       if (response.data.success) {
         // Reset form
         setFormData(initialFormState);
@@ -59,7 +64,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
         onClose();
       }
     } catch (error) {
-      setError(error.response?.data?.error || 'Failed to add employee');
+      setError(error.response?.data?.error || "Failed to add employee");
     } finally {
       setIsLoading(false);
     }
@@ -83,20 +88,29 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
           <FaTimes />
         </button>
 
-        <h3 className="text-xl font-semibold mb-6" style={{ color: colors.primaryDark }}>
+        <h3
+          className="text-xl font-semibold mb-6"
+          style={{ color: colors.primaryDark }}
+        >
           Add New Employee
         </h3>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Photo Upload */}
           <div className="md:col-span-2 flex items-center gap-4">
-            <div className="w-32 h-32 rounded-lg overflow-hidden relative"
-                 style={{ backgroundColor: colors.background }}>
+            <div
+              className="w-32 h-32 rounded-lg overflow-hidden relative"
+              style={{ backgroundColor: colors.background }}
+            >
               {previewUrl ? (
-                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                <img
+                  src={previewUrl}
+                  alt="Preview"
+                  className="w-full h-full object-cover"
+                />
               ) : (
                 <div className="w-full h-full flex items-center justify-center">
-                  <FaCamera size={24} style={{ color: colors.text + '80' }} />
+                  <FaCamera size={24} style={{ color: colors.text + "80" }} />
                 </div>
               )}
               <input
@@ -106,7 +120,7 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
                 className="absolute inset-0 opacity-0 cursor-pointer"
               />
             </div>
-            <div className="text-sm" style={{ color: colors.text + '80' }}>
+            <div className="text-sm" style={{ color: colors.text + "80" }}>
               Click to upload employee photo
             </div>
           </div>
@@ -115,14 +129,18 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
           <input
             placeholder="Full Name"
             value={formData.fullName}
-            onChange={(e) => setFormData(prev => ({ ...prev, fullName: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, fullName: e.target.value }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
           <input
             placeholder="Father's Name"
             value={formData.fatherName}
-            onChange={(e) => setFormData(prev => ({ ...prev, fatherName: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, fatherName: e.target.value }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
@@ -130,28 +148,39 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
             type="email"
             placeholder="Email"
             value={formData.email}
-            onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, email: e.target.value }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
           <input
             placeholder="Mobile Number"
             value={formData.mobile}
-            onChange={(e) => setFormData(prev => ({ ...prev, mobile: e.target.value.replace(/\D/g, '').slice(0, 10) }))}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                mobile: e.target.value.replace(/\D/g, "").slice(0, 10),
+              }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
           <input
             type="date"
             value={formData.dob}
-            onChange={(e) => setFormData(prev => ({ ...prev, dob: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, dob: e.target.value }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
           <input
             placeholder="PAN Number"
             value={formData.pan}
-            onChange={(e) => setFormData(prev => ({ ...prev, pan: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, pan: e.target.value }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
@@ -159,7 +188,9 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
             placeholder="Password"
             type="password"
             value={formData.password}
-            onChange={(e) => setFormData(prev => ({ ...prev, password: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, password: e.target.value }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
@@ -168,21 +199,30 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
           <input
             placeholder="Address Line"
             value={formData.addressLine}
-            onChange={(e) => setFormData(prev => ({ ...prev, addressLine: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, addressLine: e.target.value }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
           <input
             placeholder="City"
             value={formData.city}
-            onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+            onChange={(e) =>
+              setFormData((prev) => ({ ...prev, city: e.target.value }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
           <input
             placeholder="Pincode"
             value={formData.pincode}
-            onChange={(e) => setFormData(prev => ({ ...prev, pincode: e.target.value.replace(/\D/g, '').slice(0, 6) }))}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                pincode: e.target.value.replace(/\D/g, "").slice(0, 6),
+              }))
+            }
             className="p-3 rounded-lg"
             style={{ backgroundColor: colors.background, color: colors.text }}
           />
@@ -195,14 +235,19 @@ const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
         </div>
 
         {error && (
-          <p className="mt-4 text-sm" style={{ color: colors.danger }}>{error}</p>
+          <p className="mt-4 text-sm" style={{ color: colors.danger }}>
+            {error}
+          </p>
         )}
 
         <div className="mt-6 flex justify-end gap-4">
           <button
             onClick={onClose}
             className="px-4 py-2 rounded-lg"
-            style={{ backgroundColor: colors.danger + '20', color: colors.danger }}
+            style={{
+              backgroundColor: colors.danger + "20",
+              color: colors.danger,
+            }}
           >
             Cancel
           </button>
