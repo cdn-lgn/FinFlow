@@ -9,86 +9,73 @@
   ![License](https://img.shields.io/badge/license-MIT-blue)
 </div>
 
-## 🚀 Features
+## ✨ Key Features
 
-- **Secure Authentication**
-  - Face detection for profile verification
-  - OTP verification (Email & SMS)
-  - Location tracking for security
-  - JWT-based authentication
-
-- **Multi-Role System**
-  - User: Banking operations
-  - Employee: Account verification
-  - Admin: System management
-
-- **Banking Operations**
-  - Instant money transfers
-  - Request money feature
-  - Transaction PIN security
-  - Real-time balance updates
-  - Transaction receipt generation
-  - Download statement feature
-
-- **Security Measures**
-  - PAN card verification
-  - Employee verification system
-  - Transaction PIN encryption
+- **Authentication & Security**
+  - Face detection for profile photo
+  - Email/Mobile OTP verification
   - Location tracking for transactions
+  - PAN card verification system
+  - Employee verification process
+  - Transaction PIN security
 
-## 🛠️ Tech Stack
+- **Banking Features**
+  - Send money instantly
+  - Request money from users
+  - Track transaction history
+  - Download transaction receipts
+  - Real-time balance updates
+  - Account statements
+
+## 🛠️ Technology Stack
 
 ### Frontend
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jest/jest-plain.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="40" height="40" alt="React"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" width="40" height="40" alt="TailwindCSS"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg" width="40" height="40" alt="Redux"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="40" height="40" alt="JavaScript"/>
+  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" width="40" height="40" alt="TypeScript"/>
+  <img src="https://www.vectorlogo.zone/logos/framer/framer-icon.svg" width="40" height="40" alt="Framer Motion"/>
 </p>
 
-- React.js (Frontend framework)
-- TailwindCSS (Styling)
-- Redux Toolkit (State management)
-- Framer Motion (Animations)
-- Axios (API calls)
-- React Router (Navigation)
-- PDF Generator (Receipts & Statements)
+- React 18 with TypeScript
+- Redux Toolkit + RTK Query
+- TailwindCSS + Framer Motion
+- Face-api.js for face detection
+- React-to-PDF for receipts
 
 ### Backend
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/docker/docker-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="40" height="40" alt="Node.js"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="40" height="40" alt="Express"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="40" height="40" alt="MongoDB"/>
+  <img src="https://www.vectorlogo.zone/logos/imagekit/imagekit-icon.svg" width="40" height="40" alt="ImageKit"/>
+  <img src="https://www.vectorlogo.zone/logos/sendgrid/sendgrid-icon.svg" width="40" height="40" alt="SendGrid"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jwt/jwt-original.svg" width="40" height="40" alt="JWT"/>
 </p>
 
-- Node.js & Express.js (Server)
-- MongoDB (Database)
-- JWT (Authentication)
-- Bcrypt (Encryption)
-- Mongoose (ODM)
-- Docker (Containerization)
-- Nginx (Reverse Proxy)
+- Node.js + Express
+- MongoDB + Mongoose
+- JWT Authentication
+- ImageKit for file storage
+- SendGrid for emails
+- TextLink for SMS
 
-### Cloud Services & Tools
+### Development Tools
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" width="40" height="40"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/linux/linux-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vscode/vscode-original.svg" width="40" height="40" alt="VSCode"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/git/git-original.svg" width="40" height="40" alt="Git"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/chrome/chrome-original.svg" width="40" height="40" alt="Chrome DevTools"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/npm/npm-original-wordmark.svg" width="40" height="40" alt="npm"/>
+  <img src="https://www.vectorlogo.zone/logos/getpostman/getpostman-icon.svg" width="40" height="40" alt="Postman"/>
 </p>
 
-- AWS (Hosting)
-- ImageKit (File Storage)
-- Face-api.js (Face Detection)
-- SendGrid (Email Service)
-- TextLink SMS (SMS Service)
-- Git (Version Control)
-- PM2 (Process Management)
+- VS Code
+- Git + GitHub
+- Chrome DevTools
+- Postman
+- npm
 
 ## 📸 Screenshots
 
@@ -99,48 +86,7 @@
   <img src="./screenshots/verification.png" alt="Verification" width="400"/>
 </div>
 
-## 🚀 Getting Started
-
-1. Clone the repository
-```bash
-git clone https://github.com/yourusername/finflow.git
-```
-
-2. Install dependencies
-```bash
-cd finflow
-npm install  # Install backend dependencies
-cd frontend
-npm install  # Install frontend dependencies
-```
-
-3. Set up environment variables
-```bash
-# Backend .env
-PORT=5000
-MONGODB_URI=your_mongodb_uri
-JWT_SECRET=your_jwt_secret
-SENDGRID_API_KEY=your_sendgrid_key
-
-# Frontend .env
-REACT_APP_API_URL=http://localhost:5000/api
-```
-
-4. Run the application
-```bash
-# Backend
-npm run dev
-
-# Frontend
-cd frontend
-npm start
-```
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ---
 <div align="center">
-  Made with ❤️ by [Your Name]
+  Made with ❤️ by Team FinFlow
 </div>
