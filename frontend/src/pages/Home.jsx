@@ -5,7 +5,8 @@ import { ThemeContext } from "../context/ThemeContext";
 import {
   FaUserPlus, FaUserCheck, FaLock, FaBolt, FaChartLine,
   FaShieldAlt, FaCreditCard, FaChevronDown, FaChevronUp,
-  FaGithub, FaInstagram, FaLinkedin
+  FaGithub, FaInstagram, FaLinkedin, FaMoneyBillWave,
+  FaUserShield, FaHandHoldingUsd, FaFingerprint, FaHistory, FaKey
 } from "react-icons/fa";
 import { CiBank } from "react-icons/ci";
 
@@ -20,71 +21,77 @@ export default function Home() {
 
   const features = [
     {
+      icon: <FaMoneyBillWave size={40} />,
+      title: "Instant Money Transfer",
+      desc: "Send and receive money instantly with secure PIN verification."
+    },
+    {
+      icon: <FaUserShield size={40} />,
+      title: "KYC Verification",
+      desc: "Automatic PAN verification & employee approval system for enhanced security."
+    },
+    {
       icon: <FaCreditCard size={40} />,
-      title: "Virtual Banking",
-      desc: "Experience a fully digital banking platform—no physical cards required."
+      title: "Add Money",
+      desc: "Add funds to your account instantly using cards or UPI."
     },
     {
-      icon: <FaLock size={40} />,
-      title: "Encrypted & Secure",
-      desc: "Advanced encryption keeps your data private, secure, and fully protected."
+      icon: <FaHandHoldingUsd size={40} />,
+      title: "Request Money",
+      desc: "Request money from other FinFlow users with ease."
     },
     {
-      icon: <FaBolt size={40} />,
-      title: "Instant Transfers",
-      desc: "Transfer funds in real time with high-speed, hassle-free transactions."
+      icon: <FaFingerprint size={40} />,
+      title: "Transaction PIN",
+      desc: "Secure all transactions with a 4-digit PIN for extra protection."
     },
     {
-      icon: <FaChartLine size={40} />,
-      title: "Real-time Analytics",
-      desc: "Track your spending and savings with live financial insights and dashboards."
-    },
-    {
-      icon: <FaShieldAlt size={40} />,
-      title: "Employee Verification",
-      desc: "Our verified team members ensure safe, human-powered support and onboarding."
+      icon: <FaHistory size={40} />,
+      title: "Transaction History",
+      desc: "View detailed history of all your financial activities."
     }
   ];
-
 
   const steps = [
     {
       icon: <FaUserPlus size={40} />,
-      title: "Create Account",
-      desc: "Register using your email and a secure password in just a few simple steps."
+      title: "Quick Registration",
+      desc: "Register with PAN Card, Face Verification & Basic KYC details."
     },
     {
-      icon: <FaUserCheck size={40} />,
-      title: "Identity Verification",
-      desc: "Our team securely verifies your identity to ensure a trusted banking environment."
+      icon: <FaShieldAlt size={40} />,
+      title: "Get Verified",
+      desc: "Automatic verification with PAN or quick employee verification."
     },
     {
-      icon: <CiBank size={40} />,
-      title: "Start Banking",
-      desc: "Access all features—send, receive, and manage your funds securely and efficiently."
+      icon: <FaKey size={40} />,
+      title: "Set Transaction PIN",
+      desc: "Set your secure 4-digit PIN and start banking instantly."
     }
   ];
-
 
   const faqs = [
     {
-      question: "How do I create an account on FinFlow?",
-      answer: "Click the 'Create Account' button and follow the guided steps to sign up."
+      question: "What documents do I need for registration?",
+      answer: "You'll need your PAN card for verification, and you'll complete face verification during registration. We'll also need basic KYC details like address proof."
     },
     {
-      question: "Is my data safe with FinFlow?",
-      answer: "Yes. All user data is encrypted and stored securely in compliance with industry standards."
+      question: "How does verification work?",
+      answer: "We offer two verification methods: 1) Instant verification through PAN card matching 2) Manual verification by our banking team within 24 hours."
     },
     {
-      question: "Do I need identity verification for transactions?",
-      answer: "Basic transactions do not require verification. However, identity verification is necessary for account approval and customer support."
+      question: "How do I set up my Transaction PIN?",
+      answer: "After account verification, you can set your 4-digit transaction PIN from the dashboard's security settings. This PIN will be required for all transactions."
     },
     {
-      question: "Is FinFlow free to use?",
-      answer: "Absolutely. FinFlow is free to use with no hidden fees or surprise charges."
+      question: "What are the transaction limits?",
+      answer: "Verified accounts have no daily transaction limits. All transactions require PIN verification for security."
+    },
+    {
+      question: "Can I request money from other users?",
+      answer: "Yes, you can send money requests to other FinFlow users. They can accept or reject these requests through their dashboard."
     }
   ];
-
 
   const sectionStyle = "min-h-screen w-full snap-start flex items-center justify-center px-4";
 
@@ -157,7 +164,7 @@ export default function Home() {
             {steps.map((step, index) => (
               <motion.div
                 key={index}
-                className="text-center p-6 rounded-lg hover:shadow-md hover:shadow-blue-500/50 transition-all duration-300 transition-all duration-300"
+                className="text-center p-6 rounded-lg hover:shadow-md hover:shadow-blue-500/50 transition-all duration-300"
                 style={{ backgroundColor: colors.card }}
                 initial={{ opacity: 0 }}
                 whileInView={{ opacity: 1 }}

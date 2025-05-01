@@ -31,7 +31,7 @@ const DashboardProfile = () => {
     };
 
     return (
-      <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: colors.background + '50' }}>
+      <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: colors.background  , color: colors.text  }}>
         <h3 className="text-xl font-semibold mb-4" style={{ color: colors.primaryDark }}>
           Account Information
         </h3>

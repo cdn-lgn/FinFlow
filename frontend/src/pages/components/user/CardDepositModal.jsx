@@ -1,11 +1,11 @@
 import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
-import { ThemeContext } from '../context/ThemeContext';
+import { ThemeContext } from '../../../context/ThemeContext';
 import { FaCreditCard, FaTimes } from 'react-icons/fa';
-import axiosClient from '../utils/axiosClient';
-import LoadingButton from './LoadingButton';
+import axiosClient from '../../../utils/axiosClient';
+import LoadingButton from '../LoadingButton';
 import { useDispatch } from 'react-redux';
-import { updateBalance } from '../redux/userSlice';
+import { updateBalance } from '../../../redux/userSlice';
 
 const CardDepositModal = ({ isOpen, onClose, onSuccess }) => {
   const { colors } = useContext(ThemeContext);

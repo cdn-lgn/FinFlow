@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ThemeContext } from '../../../context/ThemeContext';
 import { FaTimes, FaCamera } from 'react-icons/fa';
 import axiosClient from '../../../utils/axiosClient';
-import LoadingButton from '../../../components/LoadingButton';
+import LoadingButton from '../LoadingButton';
 
 const AddEmployeeModal = ({ isOpen, onClose, onSuccess }) => {
   const { colors } = useContext(ThemeContext);

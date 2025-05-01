@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
-import { ThemeContext } from '../context/ThemeContext';
+import { ThemeContext } from '../../../context/ThemeContext';
 import { FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
-import LoadingButton from './LoadingButton';
-import axiosClient from '../utils/axiosClient';
+import LoadingButton from '../LoadingButton';
+import axiosClient from '../../../utils/axiosClient';
 
 const RequestActionModal = ({ request, onClose, onSuccess }) => {
   const { colors } = useContext(ThemeContext);

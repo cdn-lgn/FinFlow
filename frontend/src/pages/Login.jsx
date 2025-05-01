@@ -5,7 +5,7 @@ import axiosClient from '../utils/axiosClient';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUser } from '../redux/userSlice';
 import { useNavigate } from 'react-router-dom';
-import LoadingButton from '../components/LoadingButton';
+import LoadingButton from './components/LoadingButton';
 import getLocation from '../utils/getLocation';
 
 const Login = () => {

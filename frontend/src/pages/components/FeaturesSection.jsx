@@ -5,6 +5,7 @@ import {
   FaBolt,
   FaChartLine,
   FaUserCheck,
+  FaShieldAlt,
 } from "react-icons/fa";
 import { ThemeContext } from "../../context/ThemeContext";
 
@@ -14,28 +15,33 @@ export default function FeaturesSection() {
   const features = [
     {
       icon: <FaCreditCard size={32} color={colors.primary} />,
-      title: "Virtual Banking",
-      desc: "No physical cards, 100% online experience.",
+      title: "Instant Transfer",
+      desc: "Send money instantly to any FinFlow account with zero fees.",
     },
     {
       icon: <FaLock size={32} color={colors.primary} />,
-      title: "Encrypted & Secure",
-      desc: "Your data is safe & sound, just like your secrets 😉",
+      title: "Secure PIN",
+      desc: "Set your transaction PIN for extra security on all transfers.",
     },
     {
       icon: <FaBolt size={32} color={colors.primary} />,
-      title: "Instant Transfers",
-      desc: "Lightning fast money moves ⚡",
+      title: "Quick Deposit",
+      desc: "Add money instantly via UPI, cards, or net banking.",
     },
     {
       icon: <FaChartLine size={32} color={colors.primary} />,
-      title: "Real-time Analytics",
-      desc: "Keep track of your finances live.",
+      title: "Track Money",
+      desc: "Monitor all your transactions with detailed analytics.",
     },
     {
       icon: <FaUserCheck size={32} color={colors.primary} />,
-      title: "Employee Verification",
-      desc: "Verified support when you need it.",
+      title: "Request Money",
+      desc: "Request funds from other FinFlow users easily.",
+    },
+    {
+      icon: <FaShieldAlt size={32} color={colors.primary} />,
+      title: "Bank Security",
+      desc: "Multi-layer security with employee verification system.",
     },
   ];
 

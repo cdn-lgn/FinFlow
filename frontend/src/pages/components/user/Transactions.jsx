@@ -5,11 +5,11 @@ import { FaMoneyBill, FaArrowRight, FaArrowLeft, FaSearch, FaCreditCard } from '
 import { FiCalendar, FiFilter } from 'react-icons/fi';
 import axiosClient from '../../../utils/axiosClient';
 import dayjs from 'dayjs';
-import TransactionModal from '../../../components/TransactionModal';
-import CardDepositModal from '../../../components/CardDepositModal';
-import SendMoneyModal from '../../../components/SendMoneyModal';
-import RequestMoneyModal from '../../../components/RequestMoneyModal';
-import RequestActionModal from '../../../components/RequestActionModal';
+import TransactionModal from './TransactionModal';
+import CardDepositModal from './CardDepositModal';
+import SendMoneyModal from './SendMoneyModal';
+import RequestMoneyModal from './RequestMoneyModal';
+import RequestActionModal from './RequestActionModal';
 
 const Transactions = () => {
   const { colors } = useContext(ThemeContext);

@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import axiosClient from "../utils/axiosClient";
 import OtpVerify from "./components/OtpVerify";
 import { useNavigate } from "react-router-dom";
-import LoadingButton from "../components/LoadingButton";
+import LoadingButton from "./components/LoadingButton";
 import getLocation from "../utils/getLocation";
 
 const Signup = () => {

@@ -5,7 +5,7 @@ import { FaEdit, FaMapMarkerAlt } from "react-icons/fa";
 import { FiLoader } from "react-icons/fi";
 import { useSelector } from "react-redux";
 import axiosClient from "../../../utils/axiosClient";
-import LoadingButton from '../../../components/LoadingButton';
+import LoadingButton from '../LoadingButton';
 
 const Profile = () => {
   const { colors } = useContext(ThemeContext);

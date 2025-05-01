@@ -7,18 +7,18 @@ import { ThemeContext } from "../../context/ThemeContext";
 const steps = [
   {
     icon: <FaUserPlus size={40} />,
-    title: "Create Account",
-    desc: "Sign up with your email & secure password.",
+    title: "Register Account",
+    desc: "Sign up with KYC - PAN Card & Face Verification.",
   },
   {
     icon: <FaUserCheck size={40} />,
-    title: "Employee Verification",
-    desc: "Our staff verifies your identity manually.",
+    title: "Get Verified",
+    desc: "Quick verification by our banking team within 24 hours.",
   },
   {
-    icon:<CiBank size={40} />,
+    icon: <CiBank size={40} />,
     title: "Start Banking",
-    desc: "Send, receive & manage funds securely.",
+    desc: "Set transaction PIN and start sending/receiving money.",
   },
 ];
 

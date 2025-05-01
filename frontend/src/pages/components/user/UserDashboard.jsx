@@ -5,9 +5,9 @@ import DashboardProfile from '../DashboardProfile';
 import axiosClient from '../../../utils/axiosClient';
 import { FaMoneyBillWave, FaExchangeAlt, FaCreditCard, FaArrowRight } from 'react-icons/fa';
 import dayjs from 'dayjs';
-import SendMoneyModal from '../../../components/SendMoneyModal';
-import RequestMoneyModal from '../../../components/RequestMoneyModal';
-import CardDepositModal from '../../../components/CardDepositModal';
+import SendMoneyModal from './SendMoneyModal';
+import RequestMoneyModal from './RequestMoneyModal';
+import CardDepositModal from './CardDepositModal';
 import { useSelector } from 'react-redux';
 
 const QuickActionCard = ({ icon: Icon, title, description, color, onClick }) => {

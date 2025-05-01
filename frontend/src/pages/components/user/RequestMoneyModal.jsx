@@ -1,9 +1,9 @@
 import React, { useState, useContext } from 'react';
 import { motion } from 'framer-motion';
-import { ThemeContext } from '../context/ThemeContext';
+import { ThemeContext } from '../../../context/ThemeContext';
 import { FaMoneyBill, FaTimes } from 'react-icons/fa';
-import LoadingButton from './LoadingButton';
-import axiosClient from '../utils/axiosClient';
+import LoadingButton from '../LoadingButton';
+import axiosClient from '../../../utils/axiosClient';
 import { useSelector } from 'react-redux';
 
 const RequestMoneyModal = ({ isOpen, onClose, onSuccess }) => {

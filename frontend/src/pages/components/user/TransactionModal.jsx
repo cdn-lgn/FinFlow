@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ThemeContext } from '../context/ThemeContext';
+import { ThemeContext } from '../../../context/ThemeContext';
 import { FaMoneyBillWave, FaTimes, FaDownload, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import dayjs from 'dayjs';
 

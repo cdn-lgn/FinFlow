@@ -4,7 +4,7 @@ import { ThemeContext } from '../../../context/ThemeContext';
 import axiosClient from '../../../utils/axiosClient';
 import { FaUserTie, FaUserCog, FaEye, FaTrash, FaTimes } from 'react-icons/fa';
 import AddEmployeeModal from './AddEmployeeModal';
-import LoadingButton from '../../../components/LoadingButton';
+import LoadingButton from '../LoadingButton';
 
 const EmployeeList = () => {
   const { colors } = useContext(ThemeContext);

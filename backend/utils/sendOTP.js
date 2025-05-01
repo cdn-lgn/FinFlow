@@ -14,7 +14,7 @@ async function sendOTP(email, number)  {
     `<p>your verification OTP  for your FinFlow Bank Account is ${OTP}</p>`
   );
   await sendSMS(
-    `+91${number}`,
+    number,
     `your verification OTP  for your FinFlow Bank Account is ${OTP}`
   );
   return {

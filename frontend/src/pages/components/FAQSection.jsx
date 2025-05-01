@@ -4,21 +4,25 @@ import { FaChevronDown, FaChevronUp } from "react-icons/fa";
 
 const faqs = [
   {
-    question: "How do I create an account on FinFlow?",
-    answer: "Just click the 'Create Account' button and fill out a few simple details.",
+    question: "What documents do I need to create an account?",
+    answer: "You'll need your PAN card, valid email, mobile number, and complete our face verification process.",
   },
   {
-    question: "Is my data safe with FinFlow?",
-    answer: "Totally encrypted & locked tight.",
+    question: "How long does verification take?",
+    answer: "With automated PAN verification, it's instant. Otherwise, our team verifies within 24 hours.",
   },
   {
-    question: "Do I need employee verification for transactions?",
-    answer: "Not for regular payments. Employee verification is for account approvals & support only.",
+    question: "What are the transaction limits?",
+    answer: "Verified accounts have no daily limits. All transactions require PIN verification for security.",
   },
   {
-    question: "Is FinFlow free to use?",
-    answer: "Totally! No hidden fees, no tricks — just pure banking bliss 😌.",
+    question: "Is there a minimum balance requirement?",
+    answer: "No, FinFlow accounts have no minimum balance requirement and zero maintenance fees.",
   },
+  {
+    question: "How do I set my transaction PIN?",
+    answer: "After verification, you can set your 4-digit PIN from the dashboard's security settings.",
+  }
 ];
 
 export default function FAQSection() {

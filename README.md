@@ -1,203 +1,158 @@
+# FinFlow - Modern Banking Solution 🏦
+
+<div align="center">
+  <img src="./screenshots/logo.png" alt="FinFlow Logo" width="200"/>
+
+  [Live Demo](https://finflow-bank.vercel.app) | [API Documentation](https://api.finflow.dev)
+
+  ![GitHub last commit](https://img.shields.io/github/last-commit/yourusername/finflow)
+  ![License](https://img.shields.io/badge/license-MIT-blue)
+</div>
+
+## 🚀 Features
+
+- **Secure Authentication**
+  - Face detection for profile verification
+  - OTP verification (Email & SMS)
+  - Location tracking for security
+  - JWT-based authentication
+
+- **Multi-Role System**
+  - User: Banking operations
+  - Employee: Account verification
+  - Admin: System management
+
+- **Banking Operations**
+  - Instant money transfers
+  - Request money feature
+  - Transaction PIN security
+  - Real-time balance updates
+
+- **Security Measures**
+  - PAN card verification
+  - Employee verification system
+  - Transaction PIN encryption
+  - Location tracking for transactions
+
+## 🛠️ Tech Stack
+
+### Frontend
+<p align="center">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg" width="40" height="40"/>
+</p>
+
+- React.js (Frontend framework)
+- TailwindCSS (Styling)
+- Redux Toolkit (State management)
+- Framer Motion (Animations)
+- Axios (API calls)
+
+### Backend
+<p align="center">
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="40" height="40"/>
+</p>
+
+- Node.js & Express.js (Server)
+- MongoDB (Database)
+- JWT (Authentication)
+- Bcrypt (Encryption)
+
+### External Services
+- Face-api.js (Face detection)
+- SendGrid (Email service)
+- TextLink SMS (SMS service)
+
+## 📸 Screenshots
+
+<div align="center">
+  <img src="./screenshots/login.png" alt="Login Page" width="400"/>
+  <img src="./screenshots/dashboard.png" alt="Dashboard" width="400"/>
+  <img src="./screenshots/transfer.png" alt="Transfer Money" width="400"/>
+  <img src="./screenshots/verification.png" alt="Verification" width="400"/>
+</div>
+
+## 🔧 Core Features Implementation
+
+```javascript
+// User Authentication with Face Detection
+const handleFaceVerification = async (image) => {
+  const detections = await faceapi.detectAllFaces(image);
+  return detections.length === 1;
+};
+
+// Secure Transaction System
+const handleMoneyTransfer = async (amount, recipient, pin) => {
+  const location = await getLocation();
+  return await api.post('/transfer', {
+    amount,
+    recipient,
+    pin,
+    location
+  });
+};
+
+// Employee Verification System
+const verifyUserAccount = async (userId, panDetails) => {
+  const verification = await automaticPanVerification(panDetails);
+  if (!verification.success) {
+    return manualEmployeeVerification(userId);
+  }
+  return verification;
+};
+```
+
+## 🚀 Getting Started
+
+1. Clone the repository
+```bash
+git clone https://github.com/yourusername/finflow.git
+```
+
+2. Install dependencies
+```bash
+cd finflow
+npm install  # Install backend dependencies
+cd frontend
+npm install  # Install frontend dependencies
+```
+
+3. Set up environment variables
+```bash
+# Backend .env
+PORT=5000
+MONGODB_URI=your_mongodb_uri
+JWT_SECRET=your_jwt_secret
+SENDGRID_API_KEY=your_sendgrid_key
+
+# Frontend .env
+REACT_APP_API_URL=http://localhost:5000/api
+```
+
+4. Run the application
+```bash
+# Backend
+npm run dev
+
+# Frontend
+cd frontend
+npm start
+```
+
+## 📱 Mobile View
+<div align="center">
+  <img src="./screenshots/mobile-login.png" width="200"/>
+  <img src="./screenshots/mobile-dashboard.png" width="200"/>
+</div>
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
-
-## **Updated Project Details: Banking App with OTP Verification & Roles (Admin, Employee, User)**
-
-### **1. Core Features of the App**
-
-#### **User Registration & Account Types**:
-- **User Registration**:
-  - Bank users can **register** using **email or mobile number**.
-  - Users will **upload a face image** during registration via **face detection** (for profile photo capture only).
-  - Users will set a **6-digit PIN** for login and transactions.
-
-- **Account Types**:
-  - **Admin**: The only user who can see all the data, including charts, reports, user details, and bank-wide activities.
-  - **Bank Employee**: Employees manage the **user registration** process, verify **user documents** (such as the **PAN card**), and approve or reject new accounts.
-  - **Bank User**: Regular users who can perform transactions and manage their profiles.
-
-- **Employee Verification**:
-  - Once a user registers, **bank employees** verify the details (e.g., **PAN card** for identity verification).
-  - Employees approve the account, which then allows the user to proceed with banking services.
-
----
-
-### **2. Frontend (User Interface)**
-
-#### **Libraries and Frameworks**:
-
-1. **React**:
-   - Main framework for building the **frontend UI** with a component-based structure.
-
-2. **Material UI (MUI)**:
-   - For **UI components** like buttons, cards, and forms, which makes the UI responsive and clean.
-
-3. **Framer Motion**:
-   - Adds smooth animations for transitions and interactions on the frontend.
-
-4. **face-api.js**:
-   - Used for **face detection** during user registration, allowing users to capture their photo.
-
-5. **Axios**:
-   - Handles **HTTP requests** to the backend API (for registration, OTP verification, login).
-
-6. **React Router**:
-   - Manages **navigation** and routing between different pages like registration, login, and dashboard.
-
-7. **Formik/React Hook Form**:
-   - For handling form validation and managing form states during registration and login.
-
-8. **Chart.js / Recharts**:
-   - Used in the **Admin dashboard** to display data visualizations and charts for reports.
-
----
-
-### **3. OTP and Verification Services**
-
-You will use the following **OTP services**:
-
-1. **SMS OTP**:
-- **TextLink SMS**:
-  - Send SMS using your own **Android device** with their app.
-  - Requires setup via [TextLink Dashboard](https://textlinksms.com/dashboard/your-devices/step-by-step).
-  - No official daily free limit, but **unlimited messages** can be sent via your own device.
-  - Great for **India-based users** who want to avoid paid APIs and use their own phone for OTP delivery.
-  - Note: Requires **Google Play Services** & the TextLink app installed on your Android device.
-
-
-2. **Email OTP**:
-   - **SendGrid**:
-     - **100 emails per day**, with **daily refill**.
-     - Ideal for **email OTP-based verification** and small-scale use cases.
-
-These services will be used for:
-- **OTP-based registration**: To verify user identity during account creation.
-- **OTP-based login**: For secure user login.
-- **OTP for sensitive actions**: For transaction-related activities or password resets.
-
----
-
-### **4. Backend (Server-Side)**
-
-#### **Libraries and Frameworks**:
-
-1. **Node.js**:
-   - **Runtime environment** for backend development, efficient for I/O-heavy applications like banking apps.
-
-2. **Express.js**:
-   - A **web framework** for creating and managing backend routes and API requests.
-
-3. **MongoDB**:
-   - A **NoSQL database** for storing user data such as profiles, transaction history, PINs, and OTP tokens.
-
-4. **Mongoose**:
-   - **ODM (Object Data Modeling)** library for interacting with MongoDB, providing schema definition and querying features.
-
-5. **JWT (JSON Web Token)**:
-   - For **user authentication**. A JWT token is issued during login and used for secure access to the app.
-
-6. **bcrypt**:
-   - Used for **password hashing** and **PIN encryption** to securely store user credentials.
-
-7. **cors**:
-   - Middleware for **Cross-Origin Resource Sharing**, allowing frontend and backend to communicate securely.
-
-8. **dotenv**:
-   - Used to manage **environment variables** such as API keys, database connections, and secret keys.
-
-9. **multer**:
-   - A middleware for handling **file uploads** (e.g., profile photos or ID documents like PAN card).
-
----
-
-### **5. Microservices and Architecture**
-
-#### **Microservices Breakdown**:
-
-1. **User Authentication Service**:
-   - Manages **user registration** (email, mobile number, profile photo).
-   - Handles **PIN validation** and **JWT token generation** for secure login.
-
-2. **OTP Service**:
-   - Manages the **generation, sending, and verification** of OTP codes using **SMS** (via Textlocal/Twilio) and **email** (via SendGrid).
-
-3. **Employee Verification Service**:
-   - Bank employees can **verify user details**, including **PAN card** and other personal information.
-   - This service also handles account approval/rejection after employee validation.
-
-4. **Profile Management Service**:
-   - Manages user **profile creation**, updating profile details, and handling the **photo upload** for identity verification.
-
-5. **Transaction Service**:
-   - Handles **bank transactions** (deposit, withdrawal, transfers).
-   - **Transaction PIN validation** is required to complete sensitive actions.
-
-6. **Admin Dashboard Service**:
-   - Allows **admins** to manage the bank’s data, view reports, and access user profiles.
-   - Provides access to **charts**, **user statistics**, and **bank performance metrics**.
-
----
-
-### **6. APIs and Integrations**
-
-#### **APIs**:
-
-1. **Face-API.js API**:
-   - Used for **face detection** during **user registration** for photo capture (used only for profile image).
-
-2. **Twilio API** (SMS OTP) / **Textlocal API** (SMS OTP):
-   - Used for **SMS OTP verification** during registration, login, and other sensitive actions.
-
-3. **SendGrid API** (Email OTP):
-   - Used for sending **email OTPs** to verify user identity and secure actions.
-
-4. **Custom Backend APIs**:
-   - **User Registration API**: Handles account creation and PIN setup, stores user data.
-   - **Login API**: Authenticates users with email/mobile and PIN, and issues **JWT tokens**.
-   - **OTP Generation API**: Generates OTP and sends it to users via **SMS or Email**.
-   - **Verification API**: Allows employees to verify user documents (like **PAN card**) and approve/reject accounts.
-   - **Transaction API**: Manages user transactions with **PIN verification** for sensitive actions.
-   - **Admin Dashboard API**: Provides **admin access** to view reports, charts, and manage user data.
-
----
-
-### **7. Resources to Use**
-
-1. **Cloud Hosting**:
-   - **Heroku** (Free Tier) or **Vercel** for deploying the **frontend** (React app).
-   - **AWS EC2** or **DigitalOcean** for backend hosting.
-
-2. **Database Hosting**:
-   - **MongoDB Atlas** (Free Tier) for **cloud-hosted** database management.
-
-3. **Third-Party Services**:
-   - **Textlocal** and **Twilio** for **SMS OTP**.
-   - **SendGrid** for **email OTP**.
-
----
-
-### **8. Encryption & Security**
-
-1. **PIN Encryption**:
-   - Use **bcrypt** for hashing the **6-digit PIN** before storing it in the database.
-
-2. **JWT Authentication**:
-   - **JWT tokens** will be used for user authentication, allowing users to securely access their accounts.
-
-3. **Secure Connections**:
-   - Use **HTTPS** to secure the communication between the frontend and backend.
-
-4. **Environment Variables**:
-   - Store **sensitive information** like API keys and database credentials in **environment variables** using **dotenv**.
-
----
-
-### **Conclusion**
-
-This **banking app project** incorporates a secure, **role-based user system** with **Admin**, **Employee**, and **User** roles. Key features include:
-
-- **OTP-based registration and login** via **SMS and Email** (with services like **Textlocal**, **Twilio**, and **SendGrid**).
-- **Employee verification** of users, including document validation (such as **PAN card**).
-- **Secure banking transactions** using **6-digit PINs** and **JWT-based authentication**.
-- A responsive and modern frontend built with **React**, **Material UI**, and **Framer Motion**.
-- **Admin dashboard** with **charts** and **reports** for viewing user activities and performance.
+<div align="center">
+  Made with ❤️ by [Your Name]
+</div>
