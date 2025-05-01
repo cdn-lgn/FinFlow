@@ -1,7 +1,9 @@
 # FinFlow - Modern Banking Solution 🏦
 
 <div align="center">
-  <img src="./screenshots/logo.png" alt="FinFlow Logo" width="200"/>
+  <img src="./frontend/public/finflow-logo.png" alt="FinFlow Logo" width="200"/>
+  <br/>
+  <img src="./frontend/public/finflow-text.png" alt="FinFlow Text" width="300"/>
 
   [Live Demo](https://finflow-bank.vercel.app) | [API Documentation](https://api.finflow.dev)
 
@@ -31,12 +33,12 @@
 
 ### Frontend
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="40" height="40" alt="React"/>
-  <img src="https://raw.githubusercontent.com/teamedwardforever/Readme-Generator/71f25dd8b98329b168142a6b782a107b75eab178/svg/Skills/Frontend/tailwindcss-icon.svg" width="40" height="40" alt="TailwindCSS"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg" width="40" height="40" alt="Redux"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg" width="40" height="40" alt="JavaScript"/>
-  <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg" width="40" height="40" alt="TypeScript"/>
-  <img src="https://user-images.githubusercontent.com/7850794/164965523-3eced4c4-6020-467e-acde-f11b7900ad62.png" width="40" height="40" alt="Framer Motion"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-plain.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redux/redux-original.svg" width="40" height="40"/>
+  <img src="https://www.vectorlogo.zone/logos/framer/framer-icon.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jest/jest-plain.svg" width="40" height="40"/>
 </p>
 
 - React 18 with TypeScript
@@ -45,14 +47,14 @@
 - Face-api.js for face detection
 - React-to-PDF for receipts
 
-### Backend
+### Backend & Database
 <p align="center">
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="40" height="40" alt="Node.js"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="40" height="40" alt="Express"/>
-  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="40" height="40" alt="MongoDB"/>
-  <img src="https://raw.githubusercontent.com/imagekit-developer/imagekit-javascript/master/assets/imagekit-light-logo.svg" height="40" alt="ImageKit"/>
-  <img src="https://www.vectorlogo.zone/logos/sendgrid/sendgrid-icon.svg" width="40" height="40" alt="SendGrid"/>
-  <img src="https://jwt.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fjwt-flower.f20616b0.png&w=1920&q=75" width="40" height="40" alt="JWT"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg" width="40" height="40"/>
+  <img src="https://www.vectorlogo.zone/logos/sendgrid/sendgrid-icon.svg" width="40" height="40"/>
+  <img src="https://www.vectorlogo.zone/logos/imagekit/imagekit-icon.svg" width="40" height="40"/>
+  <img src="https://cdn.jsdelivr.net/gh/devicons/devicon/icons/jwt/jwt-original.svg" width="40" height="40"/>
 </p>
 
 - Node.js + Express
@@ -77,13 +79,28 @@
 - Postman
 - npm
 
-## 📸 Screenshots
+## 📸 App Screenshots
 
 <div align="center">
-  <img src="./screenshots/login.png" alt="Login Page" width="400"/>
-  <img src="./screenshots/dashboard.png" alt="Dashboard" width="400"/>
-  <img src="./screenshots/transfer.png" alt="Transfer Money" width="400"/>
-  <img src="./screenshots/verification.png" alt="Verification" width="400"/>
+  <h3>🔐 Authentication</h3>
+  <img src="./screenshots/auth/login.png" alt="Login" width="400"/>
+  <img src="./screenshots/auth/register.png" alt="Register" width="400"/>
+
+  <h3>👤 User Dashboard</h3>
+  <img src="./screenshots/user/dashboard.png" alt="Dashboard" width="400"/>
+  <img src="./screenshots/user/send-money.png" alt="Send Money" width="400"/>
+
+  <h3>💳 Transactions</h3>
+  <img src="./screenshots/transactions/history.png" alt="History" width="400"/>
+  <img src="./screenshots/transactions/receipt.png" alt="Receipt" width="400"/>
+
+  <h3>👥 Employee Panel</h3>
+  <img src="./screenshots/employee/verification.png" alt="Verification" width="400"/>
+  <img src="./screenshots/employee/user-list.png" alt="User List" width="400"/>
+
+  <h3>📊 Admin Dashboard</h3>
+  <img src="./screenshots/admin/stats.png" alt="Stats" width="400"/>
+  <img src="./screenshots/admin/management.png" alt="Management" width="400"/>
 </div>
 
 ---
