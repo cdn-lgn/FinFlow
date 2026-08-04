@@ -4,6 +4,22 @@
   <img src="./screenshots/logo-transparent.png" alt="FinFlow Logo" width="200"/>
 
   [Live Demo](https://fin-flow-private.vercel.app/)
+
+  > **Demo Credentials**
+
+  ```text
+  User
+  Email: rahul@gmail.com
+  Password: password
+
+  Admin
+  Email: logan@gmail.com
+  Password: password
+
+  Employee
+  Email: raju@gmail.com
+  Password: password
+  ```
 </div>
 
 ## ✨ Key Features
@@ -84,5 +100,5 @@
 
 ---
 <div align="center">
-  Made with ❤️ by Team FinFlow
+  Made with ❤️ by Logan
 </div>
